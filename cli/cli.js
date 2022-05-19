@@ -139,14 +139,7 @@ ________________________________________________________________________________
     }
     execSync(webhookCmd)
 
-    const listWebhooksCmd = `npm init speedybot webhook list -t ${token}`
-    log(`Listing your registered webhooks...`)
-
-    try {
-      execSync(listWebhooksCmd)
-    }catch(e) {
-      log('error', e)
-    }
+    log(`Done, see your webhooks with $ npm init speedybot webhook list`)
 
   },
   help(cmd, opts) {

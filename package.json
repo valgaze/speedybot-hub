@@ -1,0 +1,22 @@
+{
+  "name": "speedybot-hub",
+  "version": "0.0.4",
+  "description": "speedybot-hub: zero fuss conversational design infra",
+  "main": "index.js",
+  "bin": {
+    "speedybot-hub": "./cli/cli.js"
+  },
+  "scripts": {
+    "cli": "speedybot-hub help",
+    "deploy": "npm run build && npx wrangler publish",
+    "config": "npx wrangler init",
+    "build": "echo _fakebuildstep_",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "format": "prettier --write '**/*.{js,css,json,md}'"
+  },
+  "author": "victoralgaze <valgaze@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "prettier": "^1.18.2"
+  }
+}

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // npx speedybot-hub
 // npx speedybot-hub help
-// npx speedybot-hub setup
+// npx speedybot-hub setup  
 const { execSync, exec } = require('child_process')
 const { createInterface } = require('readline')
 const [, , command, ...args] = process.argv
@@ -56,13 +56,10 @@ const globals = {
 }
 
 const ascii = () => {
-  console.log(`
-███████╗██████╗ ███████╗███████╗██████╗ ██╗   ██╗██████╗  ██████╗ ████████╗
-██╔════╝██╔══██╗██╔════╝██╔════╝██╔══██╗╚██╗ ██╔╝██╔══██╗██╔═══██╗╚══██╔══╝
-███████╗██████╔╝█████╗  █████╗  ██║  ██║ ╚████╔╝ ██████╔╝██║   ██║   ██║   
-╚════██║██╔═══╝ ██╔══╝  ██╔══╝  ██║  ██║  ╚██╔╝  ██╔══██╗██║   ██║   ██║   
-███████║██║     ███████╗███████╗██████╔╝   ██║   ██████╔╝╚██████╔╝   ██║   
-╚══════╝╚═╝     ╚══════╝╚══════╝╚═════╝    ╚═╝   ╚═════╝  ╚═════╝    ╚═╝
+console.log(`
+╔═╗ ╔═╗ ╔═╗ ╔═╗ ╔╦╗ ╦ ╦ ╔╗  ╔═╗ ╔╦╗
+╚═╗ ╠═╝ ║╣  ║╣   ║║ ╚╦╝ ╠╩╗ ║ ║  ║
+╚═╝ ╩   ╚═╝ ╚═╝ ═╩╝  ╩  ╚═╝ ╚═╝  ╩ HUB  
 `)
 }
 
@@ -98,7 +95,7 @@ npm i
 npm run config
 `)
     const proceed = await ask(
-      'Do you want to setup your webhooks now? (you will need to know CloudFlare Worker address, ex https://helloworld.yourusername.workers.dev) [y/n]',
+      '(y/n) Do you want to setup your webhooks now? (you will need to know CloudFlare Worker address, ex https://helloworld.yourusername.workers.dev)',
     )
     if (['y', 'yes', 'yah', 1].includes(proceed)) {
       const webhooks = `npm init speedybot webhook create`
@@ -144,7 +141,13 @@ ________________________________________________________________________________
 
     const listWebhooksCmd = `npm init speedybot webhook list -t ${token}`
     log(`Listing your registered webhooks...`)
-    execSync(listWebhooksCmd)
+
+    try {
+      execSync(listWebhooksCmd)
+    }catch(e) {
+      log('error', e)
+    }
+
   },
   help(cmd, opts) {
     log(`
@@ -161,6 +164,29 @@ COMMANDS
   webhook  Create, destroy, read, modify deployed webhook (esp useful for serverless/ephemeral compute)
 `)
   },
+  config(cmd) {
+    ascii()
+    log(`
+## Welcome to Speedybot-hub.
+
+Note if you want video/written instructions see here:
+
+https://github.com/valgaze/speedybot-hub/blob/master/quickstart.md
+
+
+1. Put your WebEx bot under root config in index.js
+
+2. If you want to deploy from the command line make sure the "name" wrangler.toml matches your Worker URL and run
+
+npm run deploy
+
+2a. If you want a fully browser-based experience to start, go your Worker and select Quick Edit & copy/paste the contents of index.js in there
+
+3. Register your webhooks with your worker URL
+
+npx speedybot-hub webhook
+    `)
+  }
 }
 
 async function cli(cmd, opts) {

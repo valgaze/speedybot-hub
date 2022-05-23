@@ -1,0 +1,41 @@
+{
+  "type": "message",
+  "id": "Y2lzY29zcGFyazovL3VzL01FU1NBR0UvMzQ4YjA4MzAtZGU4Yi0xMWVjLTk2MjUtOGRkMjc4ZGIzMzlj",
+  "text": "hi multiple words abc",
+  "args": ["hi", "multiple", "words", "abc"],
+  "message": {
+    "id": "Y2lzY29zcGFyazovL3VzL01FU1NBR0UvMzQ4YjA4MzAtZGU4Yi0xMWVjLTk2MjUtOGRkMjc4ZGIzMzlj",
+    "roomId": "Y2lzY29zcGFyazovL3VzL1JPT00vNTBjNmQxMjAtOTliNS0xMWVjLTgxMmEtY2Q4NGYxN2QyZmRm",
+    "roomType": "direct",
+    "text": "hi multiple words abc",
+    "personId": "Y2lzY29zcGFyazovL3VzL1BFT1BMRS9lMTEyZTQ3MC01NjkzLTQyOWMtYjU5NC1lZmFjN2VmMDNiNGU",
+    "personEmail": "valgaze@cisco.com",
+    "created": "2022-05-28T13:36:40.499Z"
+  },
+  "person": {
+    "id": "Y2lzY29zcGFyazovL3VzL1BFT1BMRS9lMTEyZTQ3MC01NjkzLTQyOWMtYjU5NC1lZmFjN2VmMDNiNGU",
+    "emails": ["valgaze@cisco.com"],
+    "phoneNumbers": [
+      {
+        "type": "work",
+        "value": "+1 408-525-5098"
+      },
+      {
+        "type": "mobile",
+        "value": "+1 310-486-8367"
+      }
+    ],
+    "displayName": "Victor Algaze",
+    "nickName": "Victor",
+    "firstName": "Victor",
+    "lastName": "Algaze",
+    "userName": "valgaze@cisco.com",
+    "avatar": "https://avatar-prod-us-east-2.webexcontent.com/Avtr~V1~1eb65fdf-9643-417f-9974-ad72cae0e10f/V1~e112e470-5693-429c-b594-efac7ef03b4e~913a82d409e34f25bcfc903b92635d25~1600",
+    "orgId": "Y2lzY29zcGFyazovL3VzL09SR0FOSVpBVElPTi8xZWI2NWZkZi05NjQzLTQxN2YtOTk3NC1hZDcyY2FlMGUxMGY",
+    "created": "2016-01-14T15:55:08.526Z",
+    "lastModified": "2022-05-19T17:44:50.859Z",
+    "type": "person"
+  },
+  "personId": "Y2lzY29zcGFyazovL3VzL1BFT1BMRS9lMTEyZTQ3MC01NjkzLTQyOWMtYjU5NC1lZmFjN2VmMDNiNGU",
+  "phrase": "hi"
+}

@@ -1,0 +1,14 @@
+# Run sanity test for PR's to deploy
+name: Run Tests on PR
+on:
+  pull_request:
+    branches:
+      - deploy
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    name: Testrun
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run tests (expects handlers.ts in settings/)
+        run: npm test

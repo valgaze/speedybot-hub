@@ -1,6 +1,14 @@
-import { SpeedyHandlers, BOT_TEMPORARY, TRIGGER_TEMPORARY } from './../lib'
+import { Handlers, BOT_TEMPORARY, TRIGGER_TEMPORARY } from './../lib'
 
-export const handlers: SpeedyHandlers = {
+export const handlers: Handlers = {
+    '<@fileupload>': {
+        handler($bot: BOT_TEMPORARY, trigger: TRIGGER_TEMPORARY) {
+            $bot.say('yoo  ' + trigger)
+        }
+    }
+}
+
+export const handlers2: Handlers = {
     '<@fileupload>': {
         handler($bot: BOT_TEMPORARY, trigger: TRIGGER_TEMPORARY) {
             $bot.say('yoo  ' + trigger)

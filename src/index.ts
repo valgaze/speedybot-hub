@@ -8,7 +8,11 @@
  * Learn more at https://developers.cloudflare.com/workers/
  */
 
+import { SpeedyConfig } from './../lib/index'
 import { config } from './../settings/config'
+const config2:SpeedyConfig = {
+  token: 'x'
+}
 export default {
   async fetch(request: Request): Promise<Response> {
     return new Response("Hello World! " + JSON.stringify(config, null, 2));

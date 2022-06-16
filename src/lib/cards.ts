@@ -152,11 +152,11 @@ export class SpeedyCard {
     return this
   }
 
-  setChoices(choices: string[], config?: ChoiceBlock) {
-    this.choices = choices.map((choice: string, idx) => {
+  setChoices(choices: (string | number)[], config?: ChoiceBlock) {
+    this.choices = choices.map((choice: string | number, idx) => {
       return {
-        title: choice,
-        value: choice,
+        title: String(choice),
+        value: String(choice),
       }
     })
     if (config) {
@@ -197,7 +197,7 @@ export class SpeedyCard {
     return this
   }
 
-  setTable(input: string[][] | { [key: string]: string }) {
+  setTable(input: (string | number)[][] | { [key: string]: string }) {
     let core = input
     if (!Array.isArray(input) && typeof input === 'object') {
       core = Object.entries(input)

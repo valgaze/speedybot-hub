@@ -21,7 +21,6 @@ import {
 export { InitBot, WebhookBot } from './lib/bot'
 import { LocationAwareBot } from './lib/location'
 import { ENVELOPES } from './lib/payloads.types'
-import { BotConfig, WebhookBot } from './lib/bot'
 
 // Pass in BOT_TOKEN as secret, must NEVER touch source control, logs, etc
 // ex. run from folder root: $ npx wrangler secret put BOT_TOKEN
@@ -177,12 +176,12 @@ export default {
       '/': {
         method: 'POST',
         async handler(request: Request, env: Env, ctx: ExecutionContext) {
+          const json = await request.json()
           // main speedybot
           ctx.waitUntil(
             new Promise<void>(async (resolve, reject) => {
               const hub = new SpeedybotHub(config, handlers)
               try {
-                const json = await request.json()
                 await hub.processIncoming(json as ENVELOPES, request)
                 // resolve()
                 // HACK: don't resolve this promise, don't have good mechanism to

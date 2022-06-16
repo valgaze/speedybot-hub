@@ -1,4 +1,4 @@
-import { BotHandler } from '../src/lib/index'
+import { BotHandler } from '../src/lib/payloads.types'
 
 export const handlers: BotHandler[] = [
   {
@@ -27,6 +27,11 @@ export const handlers: BotHandler[] = [
               keyword: 'location',
             },
             'kitchensink',
+            'healthcheck',
+            {
+              label: 'Get advice',
+              keyword: 'api',
+            },
           ],
         })
       )
@@ -77,6 +82,7 @@ export const handlers: BotHandler[] = [
             String(idx),
             `${label}: ${helpText}`,
           ]),
+          chips: help.map(({ label }) => label),
         })
       )
     },
@@ -113,6 +119,7 @@ export const handlers: BotHandler[] = [
         })
         .setInput(`What's on your mind?`)
         .setData({ mySpecialData: { a: 1, b: 2 } })
+        .setChoices(['option a', 'option b', 'option c'])
 
       $bot.send(cardData)
     },
@@ -222,22 +229,18 @@ export const handlers: BotHandler[] = [
     hideHelp: true,
   },
   {
-    keyword: '<@botadded>',
-    async handler($bot, trigger: any) {
-      const { displayName } = await $bot.getSelf()
-      $bot.say(`Hi my name is "${displayName}" thanks for adding me here!`)
-    },
-    helpText: 'Fires whenever a bot is added to a space',
-    hideHelp: true,
-  },
-  {
     keyword: ['kitchensink', 'lab', 'kitchen'],
     async handler($bot, trigger) {
       // Clearscreen (only works desktop)
       await $bot.clearScreen()
+      await $bot.send(`## Kitchen Sink`)
 
       // $bot.translate
       $bot.send($bot.translate('cn', 'greetings.welcome'))
+      $bot.send($bot.translate('es', 'greetings.welcome'))
+      $bot.send(
+        $bot.translate('DOESNTEXIST', 'greetings.welcome', {}, 'hi (fallback!)')
+      )
 
       // Files
       // 1) File op1: Send a file from publically addressable URL

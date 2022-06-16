@@ -120,14 +120,10 @@ export class SpeedybotHub {
     submit: '<@submit>',
     file: '<@fileupload>',
     nomatch: '<@nomatch>',
-    addbot: '<@botadded>',
-    // removebot: '<botremoved>',
     reqTypes: {
       TEXT: 'TEXT',
       AA: 'AA',
       FILE: 'FILE',
-      MEMBER_REMOVE: 'MEMBERSHIP:REMOVE',
-      MEMBER_ADD: 'MEMBERSHIP:ADD',
     },
     errors: {
       placeholder: `ERROR: Placeholder token detected, you need to set a valid Bot Access token. 
@@ -193,11 +189,7 @@ If you need a token, see here: https://developer.webex.com/my-apps/new/bot`,
 
     const isHuman = await this.isHuman(personId)
     let useNoMatch = false
-    // Trick: <@botadded> won't be a human event
-    if (
-      envelope.data &&
-      (isHuman || (reqType && reqType === 'MEMBERSHIP:ADD'))
-    ) {
+    if (envelope.data && isHuman) {
       let targets = [this.constants.catchall, this.constants.nomatch]
 
       // 5) Handle attachment actions
@@ -241,14 +233,6 @@ If you need a token, see here: https://developer.webex.com/my-apps/new/bot`,
 
       if (reqType === 'FILE') {
         targets.push(this.constants.file)
-      }
-
-      // if (reqType === 'MEMBERSHIP:REMOVE') {
-      //     targets = [this.constants.removebot] // May not to be allowed to bot.say?
-      // }
-
-      if (reqType === 'MEMBERSHIP:ADD') {
-        targets = [this.constants.addbot]
       }
 
       if (reqType === 'TEXT') {
@@ -362,16 +346,7 @@ If you need a token, see here: https://developer.webex.com/my-apps/new/bot`,
     // get person data up front
     const { personId } = messageDetails
     const personData = await this.getPersonDetails(personId)
-    if (type === 'MEMBERSHIP:ADD' || type === 'MEMBERSHIP:REMOVE') {
-      const payload = {
-        type: 'membership',
-        id: messageDetails.id,
-        message: messageDetails,
-        personId: personId,
-        person: personData,
-      }
-      return payload
-    } else if (type === 'AA') {
+    if (type === 'AA') {
       const AATrigger = {
         id: messageDetails.id,
         attachmentAction: messageDetails,
@@ -670,11 +645,6 @@ If you need a token, see here: https://developer.webex.com/my-apps/new/bot`,
     let url = this.API.getMessageDetails
     if (type === 'AA') {
       url = this.API.getAttachmentDetails
-    }
-
-    if (type === 'MEMBERSHIP:REMOVE' || type === 'MEMBERSHIP:ADD') {
-      url = this.API.getMembershipDetails
-      // 'MEMBERSHIP:REMOVE' has no info
     }
 
     // else if (type === 'text' || 'file') {

@@ -22,8 +22,8 @@ import { ENVELOPES, RequestTypes } from './payloads.types'
  *
  * @returns
  */
-export const typeIdentifier = (payload: ENVELOPES): RequestTypes | null => {
-  let type = null
+export const typeIdentifier = (payload: ENVELOPES): RequestTypes => {
+  let type
   if (payload.resource === 'messages') {
     if ('files' in payload.data && payload.data.files?.length) {
       const { files = [] } = payload.data
@@ -281,232 +281,25 @@ Server(less) Time: ${new Date().toString()}
     { status: 200 }
   )
 
-export const ui_html = `
-  <script src="https://code.s4d.io/widget-space/production/bundle.js"></script>
-  <link rel="stylesheet" href="https://code.s4d.io/widget-space/production/main.css">
-  
-  <link rel="stylesheet" href="https://code.s4d.io/widget-recents/production/main.css">
-  <script src="https://code.s4d.io/widget-recents/production/bundle.js"></script>
-  
-  <style>
-      input {
-          cursor: pointer;
-          color: #34495e;
-          font-size: 1rem;
-          line-height: 1.4rem;
-          width: 100%;
-          font-family: 'Courier New';
-          margin: 6px;
-          background: #ecf0f1;
-      }
-  
-      * {
-          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-          font-size: 14px;
-          color: #34495e;
-      }
-      body {
-          background-color:  #ecf0f1;
-      }
-      .launch-button {
-          background: #2ecc71;
-          padding: 1%;
-          color: #fff;
-          font-weight: 900;
-          font-family: sans-serif;
-          border: none;
-          border-radius: 14px;
-          cursor: pointer;
-      }
-  
-      .launch-button:hover {
-          background: #41d47f;
-      }
-  
-      .launch-wrap {
-          padding: 1%;
-      }
-  </style>
-  <body>
-      <div class="chat-wrap">
-          <fieldset>
-              <legend>WebEx in a Web Embed</legend>
-              <div>
-                       <label>👆 Stable Source available <b><a href="https://github.com/valgaze/speedybot/blob/master/docs/webex.html" target="_blank">here</a></b>) </label> <br/>
-                  <label>Set access id (copy access token from <a href="https://developer.webex.com/my-apps" target="_blank">here</a>): </label>
-                  <input type="text" id="access_id_input" value="" placeholder="access id here" />
-              </div>
-              <button id="launch" class="launch-button">LAUNCH</button>
-          </fieldset>
-          <div class="launch-wrap">
-              <div style="display: flex; justify-content: center;">
-                  <div id="webex-recent" style="width: 500px; height: 500px;"></div>
-                  <div id="webex-space" style="width: 500px; height: 500px; background: radial-gradient(#e74c3c, transparent); display:flex; justify-content: center;">
-                      <div>
-                          <h3>Select a 1-1 conversation from the left </h3>
-                          <div>Note: Bots can only request mentions, not whole conversations</div>
-                      </div>
-                  </div>
-              </div>
-          </div>
-          <fieldset>
-              <legend>Send Rich Card</legend>
-              <div class="form-group">
-                <label class="col-md-4 control-label" for="card_title">Title</label>
-                <div class="col-md-4">
-                <input id="card_title" name="card_title" type="text" />
-                </div>
-              </div>
-  
-              <div class="form-group">
-                <label for="card_subtitle">Subtitle</label>
-                <div>
-                <input id="card_subtitle" name="card_subtitle" type="text" />
-                </div>
-              </div>
-  
-              <div class="form-group">
-                <label class="control-label" for="image_url">Image URL</label>
-                <div>
-                <input id="image_url" name="image_url" type="text" />
-                </div>
-              </div>
-  
-              <button id="send_card" class="launch-button">Send Card</button>
-  
-          </fieldset>
-  
-      </div>
-      <script>
-          let targetRoom = null;
-          const urlParams = new URLSearchParams(window.location.search);
-          const access_id = urlParams.get('access_id')
-          const $recent = document.querySelector('#webex-recent')
-          const $space = document.querySelector('#webex-space')
-          const $input = document.querySelector('#access_id_input')
-          const setInputs = (selectors, vals) => {
-              selectors.forEach((selector, idx) => {
-                  document.querySelector(selector, idx).value = vals[idx]
-              })
-          }
-          const mountRecent = ($, access_id, $space) => {
-              try {
-                  webex.widget($).remove()
-              }catch(e) {}
-              webex.widget($).recentsWidget({
-                  accessToken: access_id,
-              });
-              $.addEventListener('rooms:selected', (e) => {
-                  const {id} = e.detail.data
-                  mountSpace($space, access_id, id)
-                  targetRoom = id
-                  console.log('#', targetRoom)
-              })
-          }
-  
-          const mountSpace = ($, access_id, roomId) => {
-              try {
-                  webex.widget($).remove()
-              }catch(e) {}
-              webex.widget($).spaceWidget({
-                  accessToken: access_id,
-                  destinationId: roomId,
-                  destinationType: 'spaceId',
-              });
-          }
-  
-          document.querySelector('#launch').addEventListener('click', (e) => {
-              const access_id = $input.value
-              mountRecent($recent, access_id, $space)
-          })
-  
-          document.querySelector('#send_card').addEventListener('click', (e) => {
-              if (!targetRoom) {
-                  alert('Select a room first')
-                  return
-              }
-  
-              const form = {
-                  card_title: document.querySelector('#card_title'),
-                  card_subtitle: document.querySelector('#card_subtitle'),
-                  image_url: document.querySelector('#image_url'),
-                  send_card: document.querySelector('#send_card')
-              }
-  
-              const card = {
-                  title: form.card_title.value,
-                  subtitle: form.card_subtitle.value,
-                  url: form.image_url.value
-              }
-  
-              const cardData = generateCard(card)
-              sendCard(targetRoom, cardData)
-          })
-  
-  
-          if (access_id) {
-              mountRecent($recent, access_id, $space)
-              setInputs(['#access_id_input'], [access_id])
-          }
-  
-          async function sendCard(roomId, cardPayload, fallbackText="It appears your client cannot render adpative cards.") {
-              const access_id = $input.value
-              const endpoint = 'https://webexapis.com/v1/messages'
-  
-              const card = {
-                  roomId,
-                  markdown: fallbackText,
-                  attachments: [{
-                      contentType: "application/vnd.microsoft.card.adaptive",
-                      content: cardPayload
-                  }]
-              }
-  
-              const response = await fetch(endpoint, {
-                  method: 'POST',
-                  headers: {
-                      'Content-Type': 'application/json',
-                      'Authorization': 'Bearer ' + access_id
-                  },
-                  body: JSON.stringify(card)
-              })
-              const content = await response.json();
-          }
-  
-          function generateCard({title, subtitle, url}) {
-              const card = {
-                  type: "AdaptiveCard",
-                  version: "1.0",
-                  body: []
-              }
-  
-              if (title) {
-                  card.body.push({
-                          type: "TextBlock",
-                          text: title,
-                          size: "large",
-                          weight: "bolder",
-                          color: "dark"
-                      })
-              }
-  
-              if (subtitle) {
-                  card.body.push({
-                          type: "TextBlock",
-                          text: subtitle,
-                          size: "medium",
-                          weight: "bolder",
-                          color: "dark"
-                      })
-              }
-  
-              if (image_url) {
-                  card.body.push({
-                          type: "Image",
-                          url: url
-                      })
-              }
-              return card
-          }
-      </script>
-  </body>`
+export const ui_html = `<script src="https://code.s4d.io/widget-space/production/bundle.js"></script> <link rel="stylesheet" href="https://code.s4d.io/widget-space/production/main.css"> <link rel="stylesheet" href="https://code.s4d.io/widget-recents/production/main.css"> <script src="https://code.s4d.io/widget-recents/production/bundle.js"></script> <style>input{cursor: pointer; color: #34495e; font-size: 1rem; line-height: 1.4rem; width: 100%; font-family: 'Courier New'; margin: 6px; background: #ecf0f1;}*{font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; font-size: 14px; color: #34495e;}body{background-color: #ecf0f1;}.launch-button{background: #2ecc71; padding: 1%; color: #fff; font-weight: 900; font-family: sans-serif; border: none; border-radius: 14px; cursor: pointer;}.launch-button:hover{background: #41d47f;}.launch-wrap{padding: 1%;}</style> <body> <div class="chat-wrap"> <fieldset> <legend>WebEx in a Web Embed</legend> <div> <label>👆 Stable Source available <b><a href="https://github.com/valgaze/speedybot/blob/master/docs/webex.html" target="_blank">here</a></b>) </label> <br/> <label>Set access id (copy access token from <a href="https://developer.webex.com/my-apps" target="_blank">here</a>): </label> <input type="text" id="access_id_input" value="" placeholder="access id here"/> </div><button id="launch" class="launch-button">LAUNCH</button> </fieldset> <div class="launch-wrap"> <div style="display: flex; justify-content: center;"> <div id="webex-recent" style="width: 500px; height: 500px;"></div><div id="webex-space" style="width: 500px; height: 500px; background: radial-gradient(#e74c3c, transparent); display:flex; justify-content: center;"> <div> <h3>Select a 1-1 conversation from the left </h3> <div>Note: Bots can only request mentions, not whole conversations</div></div></div></div></div><fieldset> <legend>Send Rich Card</legend> <div class="form-group"> <label class="col-md-4 control-label" for="card_title">Title</label> <div class="col-md-4"> <input id="card_title" name="card_title" type="text"/> </div></div><div class="form-group"> <label for="card_subtitle">Subtitle</label> <div> <input id="card_subtitle" name="card_subtitle" type="text"/> </div></div><div class="form-group"> <label class="control-label" for="image_url">Image URL</label> <div> <input id="image_url" name="image_url" type="text"/> </div></div><button id="send_card" class="launch-button">Send Card</button> </fieldset> </div><script>let targetRoom=null; const urlParams=new URLSearchParams(window.location.search); const access_id=urlParams.get('access_id') const $recent=document.querySelector('#webex-recent') const $space=document.querySelector('#webex-space') const $input=document.querySelector('#access_id_input') const setInputs=(selectors, vals)=>{selectors.forEach((selector, idx)=>{document.querySelector(selector, idx).value=vals[idx]})}const mountRecent=($, access_id, $space)=>{try{webex.widget($).remove()}catch(e){}webex.widget($).recentsWidget({accessToken: access_id,}); $.addEventListener('rooms:selected', (e)=>{const{id}=e.detail.data mountSpace($space, access_id, id) targetRoom=id console.log('#', targetRoom)})}const mountSpace=($, access_id, roomId)=>{try{webex.widget($).remove()}catch(e){}webex.widget($).spaceWidget({accessToken: access_id, destinationId: roomId, destinationType: 'spaceId',});}document.querySelector('#launch').addEventListener('click', (e)=>{const access_id=$input.value mountRecent($recent, access_id, $space)}) document.querySelector('#send_card').addEventListener('click', (e)=>{if (!targetRoom){alert('Select a room first') return}const form={card_title: document.querySelector('#card_title'), card_subtitle: document.querySelector('#card_subtitle'), image_url: document.querySelector('#image_url'), send_card: document.querySelector('#send_card')}const card={title: form.card_title.value, subtitle: form.card_subtitle.value, url: form.image_url.value}const cardData=generateCard(card) sendCard(targetRoom, cardData)}) if (access_id){mountRecent($recent, access_id, $space) setInputs(['#access_id_input'], [access_id])}async function sendCard(roomId, cardPayload, fallbackText="It appears your client cannot render adpative cards."){const access_id=$input.value const endpoint='https://webexapis.com/v1/messages' const card={roomId, markdown: fallbackText, attachments: [{contentType: "application/vnd.microsoft.card.adaptive", content: cardPayload}]}const response=await fetch(endpoint,{method: 'POST', headers:{'Content-Type': 'application/json', 'Authorization': 'Bearer ' + access_id}, body: JSON.stringify(card)}) const content=await response.json();}function generateCard({title, subtitle, url}){const card={type: "AdaptiveCard", version: "1.0", body: []}if (title){card.body.push({type: "TextBlock", text: title, size: "large", weight: "bolder", color: "dark"})}if (subtitle){card.body.push({type: "TextBlock", text: subtitle, size: "medium", weight: "bolder", color: "dark"})}if (image_url){card.body.push({type: "Image", url: url})}return card}</script> </body>`
+
+// Serve b64 background image
+export const colorGenerator = (b64: string) => {
+  // All this to make a stupid background color...
+  const base64ToArrayBuffer = (base64: string) => {
+    const binary = atob(base64)
+    const length = binary.length
+    // new container
+    const bytes = new Uint8Array(length)
+    for (var i = 0; i < length; i++) {
+      bytes[i] = binary.charCodeAt(i)
+    }
+    return bytes.buffer
+  }
+  return new Response(base64ToArrayBuffer(b64), {
+    status: 200,
+    headers: {
+      'content-type': 'image/png',
+    },
+  })
+}

@@ -3,7 +3,7 @@
   "bin": {
     "speedybot-hub": "./cli/cli.js"
   },
-  "version": "1.0.0",
+  "version": "1.0.1",
   "devDependencies": {
     "@babel/core": "^7.18.2",
     "@babel/preset-env": "^7.18.2",
@@ -13,6 +13,7 @@
     "isomorphic-fetch": "^3.0.0",
     "jest": "^28.1.0",
     "ts-jest": "^28.0.3",
+    "typedoc": "^0.22.18",
     "typedoc-theme-category": "^1.0.7",
     "typedoc-theme-hierarchy": "^1.2.1",
     "typescript": "^4.7.2",
@@ -20,9 +21,8 @@
   },
   "private": true,
   "scripts": {
-    "docz": "npm run docs:h && open http://localhost:1337 && cd api-docs && npx serve -p 1337",
-    "docs:h": "rm -rf api-docs 2>/dev/null && npx --yes typedoc --media docs/assets --out api-docs --plugin ./node_modules/typedoc-theme-category/dist/index.js --theme category src/lib/index.ts",
-    "docs": "rm -rf api-docs 2>/dev/null && npx --yes typedoc --media docs/assets --out api-docs src/index.ts",
+    "docs": "rm -rf api-docs 2>/dev/null && npx --yes typedoc --media docs/assets --out api-docs src/docs.ts",
+    "docs:md": "npm i typedoc-plugin-markdown && rm -rf api-docs 2>/dev/null && npx --yes typedoc --media docs/assets --plugin typedoc-plugin-markdown --out api-docs src/docs.ts",
     "build": "tsc src/index.ts",
     "test": "npx jest",
     "serve": "npx wrangler dev src/index.ts",
@@ -33,5 +33,8 @@
     "publish": "wrangler publish",
     "build:lib": "tsc --project tsconfig_lib.json",
     "append": "echo \"\n\" >> wrangler.toml && echo [vars] >> wrangler.toml && echo TOKEN = \"$1\" >> wrangler.toml"
+  },
+  "dependencies": {
+    "typedoc-plugin-markdown": "^3.12.1"
   }
 }

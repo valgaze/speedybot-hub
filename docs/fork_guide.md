@@ -1,4 +1,4 @@
-## 🍴 Fork'ing Guide
+## 🍴 Fork Guide
 
 If you follow this guide you will end up with zero-config agent/repo where anytime you make a content change on the `deploy` branch, the agent will be automatically deployed using **[Github Actions](https://github.com/features/actions)** -- see the **["workflows" directory](./../.github/workflows/)** for details. The included actions handle deployment, webhook registration and **[secure secrets management](https://docs.github.com/en/actions/security-guides/encrypted-secrets)** for you so you can focus on what matters-- content + rich integrations.
 
@@ -48,7 +48,7 @@ By now you should have 4 pieces of information
 BOT_TOKEN: xxxyyyzzz123
 CF Account Id: xxxyyyzzz456
 CF API Key: xxxyyyzzz789
-Bot url: https://speedybot-hub.username.workers.dev
+Bot url (host): https://speedybot-hub.username.workers.dev
 ```
 
 Go back to your forked repo and tap the settings button at https://github.com/_your_username_/speedybot-hub/settings/secrets/actions and add your secrets with exactly these names

@@ -1,9 +1,9 @@
 import { SpeedyCard } from './cards'
 
 import { BotRoot } from './bot'
-export type BotHandler<T = MESSAGE_TRIGGER> = {
+export type BotHandler<K = any, T = MESSAGE_TRIGGER> = {
   keyword: string | string[] | (string | RegExp)[]
-  handler(bot: BotRoot, trigger: T): Promise<void> | void
+  handler(bot: BotRoot<K>, trigger: T): Promise<void> | void
   helpText?: string
   hideHelp?: boolean
 }
@@ -443,3 +443,19 @@ export const reqTypesEnum = Object.freeze({
   TEXT: 'TEXT',
   MEMBERSHIP_ADD: 'MEMBERSHIP:ADD',
 })
+
+export type MessageReply = {
+  id: string
+  roomId: string
+  roomType: string
+  text: string
+  personId: string
+  personEmail: string
+  markdown: string
+  html: string
+  created: Date | string
+  attachments?: {
+    contentType?: string
+    content?: any // type this properly
+  }[]
+}

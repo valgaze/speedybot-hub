@@ -19,53 +19,42 @@ import {
 } from './payloads.types'
 
 /**
- * 
- * Speedybot Config
- * token: string; // bot token, make one here: https://developer.webex.com/my-apps/new
- * debug: boolean; // show debug logs & report errors to chat if possible 
- * fallbackText: // text that display if user's client can't display Adaptive Cards (otherwise default message)
- * features: {
- *   chips: {
- *     disappearOnTop: boolean
- *   }
- * }
- * location: function; // After user authorizes location will run this function with access to roomId & messageId
+ *  This is the root configuration object for your hub. Most important is "token" and that value should never be put into source code
  * 
  * 
- * Here you can run whatever validation checks you want
- * you need to ultimately return proceed: boolean
  * 
- * 
- * Ex. Register webhook with a secret:
- * $ npm init speedybot webhook create -- -t __bot_token_here__ -w https://speedybot-hub.username.workers.dev -s __secret_here__
- * 
- * 
+ * - token: string; // bot token, make one here: https://developer.webex.com/my-apps/new
+ * - debug: boolean; // show debug logs & report errors to chat if possible
+ * - fallbackText: // text that display if user's client can't display Adaptive Cards (otherwise default message)
+ * - location: function; // After user authorizes location will run this function with access to roomId & messageId
+ * - validation: function // to run for incoming requests see below
+ *
+ * ### Validation
+ * For validation, you can run whatever validation checks you want but ultimately need to finish with ```{ proceed: boolean }```
 - https://github.com/webex/SparkSecretValidationDemo
 - https://developer.webex.com/blog/using-a-webhook-secret
 - https://developer.webex.com/blog/building-a-more-secure-bot
 
 ```ts
-async validate(request: Request) {
-    const signature = request.headers.get('X-Spark-Signature')
-    const res = {
-        proceed: true
-    }
-
-    if (signature && signature.length) {
-        const json = await request.json()
-        const cryptoValidate = (body:any, signature:any) => {
-            // use WebCrypto
-            // Use your secret to hash body
-            // and compare to signature
-            return true
-        }
-        res.proceed = cryptoValidate(json, signature)
-    }
-    return res
-}
-```
+* async validate(request: Request) {
+*    const signature = request.headers.get('X-Spark-Signature')
+*    const res = {
+*        proceed: true
+*    }
 *
-* 
+*    if (signature && signature.length) {
+*        const json = await request.json()
+*        const cryptoValidate = (body:any, signature:any) => {
+*            // use WebCrypto
+*            // Use your secret to hash body
+*            // and compare to signature
+*            return true
+*        }
+*        res.proceed = cryptoValidate(json, signature)
+*    }
+*    return res
+* }
+* ```
 **/
 export type SpeedyConfig = {
   token: string
@@ -94,7 +83,7 @@ type Globals = {
   roomId: string
 }
 
-export class SpeedybotHub {
+export class SpeedybotHub<T = any> {
   globals: Globals = {
     roomId: '',
     personId: '',
@@ -137,7 +126,11 @@ If you need a token, see here: https://developer.webex.com/my-apps/new/bot`,
     },
   }
 
-  constructor(private config: SpeedyConfig, private handlers: BotHandler[]) {
+  constructor(
+    private config: SpeedyConfig,
+    private handlers: BotHandler[],
+    private env: T = {} as T
+  ) {
     if (config.token === placeholder) {
       const error = this.constants.errors.placeholder
       throw new Error(error)
@@ -145,14 +138,6 @@ If you need a token, see here: https://developer.webex.com/my-apps/new/bot`,
   }
 
   async processIncoming(envelope: ENVELOPES, request: Request) {
-    // const Bot = {
-    //   ...bot,
-    //   sendDataAsFile: bot.sendDataAsFile.bind({ token: this.config.token }),
-    //   send: this.send.bind({ ...this, send: this.send, ...this.API }),
-    //   getSelf: this.getSelf.bind(this),
-    //   meta: { url: request?.url },
-    // }
-
     // TODO: break into more coherent smaller pieces w/o using lotta memory+space
     this.debug('##', envelope)
 
@@ -173,7 +158,7 @@ If you need a token, see here: https://developer.webex.com/my-apps/new/bot`,
     let reqType = typeIdentifier(envelope)
     const additionalInfo = (await this.getEnhancedDetails(
       envelope,
-      reqType as RequestTypes
+      reqType
     )) as MessageDetails
 
     // 3) Fetch room info
@@ -214,7 +199,7 @@ If you need a token, see here: https://developer.webex.com/my-apps/new/bot`,
             targets = [this.constants.submit]
           }
         } else {
-          // Delete on button tap (here it's ofc incoming chip tap)
+          // Delete on button tap
           const disappear = this.config.features?.chips?.disappearOnTop
           if (disappear) {
             await this.deleteMessage(assertAADetails.messageId)
@@ -261,6 +246,7 @@ If you need a token, see here: https://developer.webex.com/my-apps/new/bot`,
         if (target === textFlag && !checkHandler(botHandler)) {
           useNoMatch = true
         }
+
         if (target === this.constants.nomatch && checkHandler(botHandler)) {
           noMatchRef = botHandler
           return
@@ -320,8 +306,9 @@ If you need a token, see here: https://developer.webex.com/my-apps/new/bot`,
       fallbackText: this.globals.fallbackText,
       locales: this.config.locales ? this.config.locales : {},
       helpContent: this.generateHelp(),
+      env: this.env,
     }
-    const Bot = InitBot(BotConfig)
+    const Bot = InitBot<typeof this.env>(BotConfig)
     await botHandler.handler(Bot, trigger as MESSAGE_TRIGGER)
   }
 

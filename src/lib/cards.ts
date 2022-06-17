@@ -1,10 +1,16 @@
+import { checkers } from './common'
+
 export type AbbreviatedSpeedyCard = {
   title: string
   subTitle: string
   image: string
   url: string
+  urlLabel: string
   data: AttachmentData
   chips: (string | { label: string; keyword?: string })[]
+  table: string[][] | { [key: string]: string }
+  choices: (string | number)[]
+  backgroundImage: string
 }
 
 export interface BaseConfig {
@@ -63,8 +69,9 @@ export interface LinkButton {
 }
 
 export interface inputConfig {
-  id: string
+  id?: string
   placeholder?: string
+  isMultiline?: boolean
 }
 
 export interface Fact {
@@ -126,7 +133,20 @@ export class SpeedyCard {
   public needsSubmit = false
   public dateData: Partial<SelectorPayload> = {}
   public timeData: Partial<SelectorPayload> = {}
+  public backgroundImage = ''
+  public texts: {
+    type?: string // TextBlock
+    text?: string
+    horizontalAlignment?: string // Left | Center | Right
+    size?: string
+  }[] = []
+  public details: {
+    type: string
+    title: string
+    card: any
+  }[] = []
 
+  // Super loose typing for now
   public json: EasyCardSpec = {
     $schema: 'http://adaptivecards.io/schemas/adaptive-card.json',
     type: 'AdaptiveCard',
@@ -136,6 +156,26 @@ export class SpeedyCard {
 
   constructor() {}
 
+  setText(text: string | string[]) {
+    if (Array.isArray(text)) {
+      text.forEach((t) => this.setText(t))
+    } else {
+      const payload = {
+        type: 'TextBlock',
+        text: text,
+        horizontalAlignment: 'Left',
+        size: 'Medium',
+      }
+      this.texts.push(payload)
+    }
+
+    return this
+  }
+
+  setBackgroundImage(url: string) {
+    this.backgroundImage = url
+    return this
+  }
   setTitle(title: string, config?: Partial<TextBlock>) {
     this.title = title
     if (config) {
@@ -214,11 +254,11 @@ export class SpeedyCard {
     return this
   }
 
-  setDate(id = 'selectedDate', label: string = 'Select a date') {
+  setDate(id = 'selectedDate') {
     const payload = {
       type: 'Input.Date',
       id,
-      label,
+      // label,
     }
     this.dateData = payload
     return this
@@ -231,6 +271,41 @@ export class SpeedyCard {
       label,
     }
     this.timeData = payload
+    return this
+  }
+
+  /**
+   *
+   * Add a card into a card
+   *
+   * Kinda like Action.Showcard: https://adaptivecards.io/explorer/Action.ShowCard.html
+   *
+   *
+   * @param payload (another SpeedyCard)
+   * @param label
+   * @returns
+   */
+  setDetail(
+    payload: Partial<AbbreviatedSpeedyCard & { label?: string }> | SpeedyCard,
+    label?: string
+  ) {
+    const isCard = checkers.isCard(payload)
+    let buttonLabel = label || 'Details'
+    if ('label' in payload) {
+      buttonLabel = payload.label as string
+    }
+    let card
+    if ('render' in payload) {
+      card = payload.render()
+    } else if (!isCard) {
+      card = this.card(payload).render()
+    }
+
+    this.details.push({
+      type: 'Action.ShowCard',
+      title: buttonLabel,
+      card,
+    })
     return this
   }
 
@@ -267,6 +342,10 @@ export class SpeedyCard {
   }
 
   render() {
+    if (this.backgroundImage) {
+      this.json.backgroundImage = this.backgroundImage
+    }
+
     if (this.title) {
       const payload: TextBlock = {
         type: 'TextBlock',
@@ -374,6 +453,12 @@ export class SpeedyCard {
       this.needsSubmit = true
     }
 
+    if (this.texts.length) {
+      this.texts.forEach((text) => {
+        this.json.body.push(text)
+      })
+    }
+
     if (this.needsSubmit) {
       interface SubmitPayload {
         type: string
@@ -384,7 +469,7 @@ export class SpeedyCard {
         type: 'Action.Submit',
         title: this.buttonLabel,
       }
-      if (this.attachedData) {
+      if (this.attachedData && Object.keys(this.attachedData).length) {
         payload.data = this.attachedData
       }
 
@@ -413,7 +498,78 @@ export class SpeedyCard {
         this.json.actions = [payload]
       }
     }
+
+    if (this.details.length) {
+      if (!this.json.actions) {
+        this.json.actions = []
+      }
+
+      this.details.forEach((detail) => this.json.actions.push(detail))
+    }
+
     return this.json
+  }
+
+  card(config: Partial<AbbreviatedSpeedyCard> = {}): SpeedyCard {
+    const card = new SpeedyCard()
+    const {
+      title = '',
+      subTitle = '',
+      image = '',
+      url = '',
+      urlLabel = '',
+      data = {},
+      chips = [],
+      table = [],
+      choices = [],
+      backgroundImage = '',
+    } = config
+
+    if (backgroundImage) {
+      card.setBackgroundImage
+    }
+    if (title) {
+      card.setTitle(title)
+    }
+
+    if (subTitle) {
+      card.setSubtitle(subTitle)
+    }
+
+    if (image) {
+      card.setImage(image)
+    }
+
+    if (url) {
+      card.setUrl(url)
+    }
+
+    if (urlLabel) {
+      card.setUrlLabel(urlLabel)
+    }
+
+    if (Object.keys(data).length) {
+      card.setData(data)
+    }
+
+    if (chips.length) {
+      card.setChips(chips)
+    }
+
+    if (choices.length) {
+      card.setChoices(choices)
+    }
+
+    if (table) {
+      if (Array.isArray(table) && table.length) {
+        card.setTable(table)
+      } else {
+        if (Object.entries(table).length) {
+          card.setTable(table)
+        }
+      }
+    }
+    return card
   }
 
   renderFull() {
@@ -434,6 +590,7 @@ export interface EasyCardSpec {
   version: string
   body: any
   actions?: any
+  backgroundImage?: string
 }
 /**
  * 

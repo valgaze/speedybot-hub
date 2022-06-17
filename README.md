@@ -1,146 +1,118 @@
-# 🏖 `speedybot hub` super-fast "no-ops" conversation design infrastructure
+# 🏖 `speedybot hub` [λLambda-editionλ] super-fast "no-ops" conversation design infrastructure
 
 ```
 ╔═╗ ╔═╗ ╔═╗ ╔═╗ ╔╦╗ ╦ ╦ ╔╗  ╔═╗ ╔╦╗
 ╚═╗ ╠═╝ ║╣  ║╣   ║║ ╚╦╝ ╠╩╗ ║ ║  ║
-╚═╝ ╩   ╚═╝ ╚═╝ ═╩╝  ╩  ╚═╝ ╚═╝  ╩ HUB
+╚═╝ ╩   ╚═╝ ╚═╝ ═╩╝  ╩  ╚═╝ ╚═╝  ╩ HUB (λ-Edition)
+
+tl:dr; serverless chat infra
 ```
 
+📚 [API Docs](./api-docs/modules.md)
+
+**What is this:** 🧪Experimental🔬 branch that ports **[speedybot-hub](https://github.com/valgaze/speedybot-hub)** for use in an AWS Lambda function (rather than serverless+containerless Workers or V8 Isolates)
+
+**[jump to setup](#setup)**
+**[jump to issues](#issues)**
+
+Once you have the infrastructure up, the only directory that you need to really think about is **[settings](./settings/)** which houses your agent's handlers & integrations.
+
+## Video instructions
+
+- 🎥 [EN] https://share.descript.com/view/mJ9mY8swWId
+
+## Setup
+
+**Note on "SST":** This branch uses **[Serverless Stack (SST)](https://serverless-stack.com/)** toolchain for provisioning, deployment of infrastructure. SST is built on top of a version **[AWS Cloud Development Kit (cdk)](https://aws.amazon.com/cdk/)** let's you express your infrastructure needs as spec/code. Its **[live-reload editing feature for Lambda functions](https://docs.sst.dev/live-lambda-development)** will likely be a game-changer for people building conversation experiences which reuire rapid testing + experimentation
+
+likely come in handy for people building conversation experiences who need to rapidly make many content/integration changes.
+
+## 1. Fetch repo & install dependencies
+
+Note: We need to checkout the "lambda" branch below
+
 ```
-tl:dr; serverless chat that actually works
-```
-
-Speedybot-hub is a zero-config and really fast central "hub" for all your conversation design needs-- especially rich 3rd-party integrations, incoming webhooks, handling files/photos, etc.
-
-## Get up and running
-
-See **[quickstart.md](./quickstart.md)** on how to get up and running fast
-
-Alternatively, go ahead and **[🍴Fork this repo🍴](https://github.com/valgaze/speedybot-hub/blob/deploy/docs/fork_guide.md)** for a zero-effort that'll take care of almost everything for you.
-
-## Features
-
-- 🌟 Zero External Dependencies 🌟
-- Adds support tappable suggestion "chips"
-- Optimized for **[V8 Isolates](https://developers.cloudflare.com/workers/learning/how-workers-works/)** for milisecond response times (🥶 no more cold start problems 🥶)
-- Includes SpeedyCard card builder (create rich **[Adaptive Cards](https://developer.webex.com/docs/api/guides/cards)** without wrangling JSON)
-- Locale & i18n support
-- Supports multiple keywords for single handlers (without duplicating handlers)
-- Auto-register webhooks using **[Github Actions](https://github.com/features/actions)** if you fork this repo, see **[here for details](./docs/fork_guide.md)**
-- Edit conversation content & functionality directly in a browser-based editor
-- "Magic" keywords to detect no match, run on every and many others (see **[below for details](#special-magic-keywords)**)
-
-## Motivation
-
-Think of these little "hubs" as central spots around which all your conversation design infrastructure + integrations + all the rest can gather-- including incoming webhooks. You shouldn't have to think about anything but what matters in a conversation-- (1) the content + (2) useful/labor-savings rich integrations (files, location, sensors, etc)
-
-Speedybot-hub takes care of virtually all of the "everything else" details so all you and your team need to think about is about a single file: **[settings/handlers.ts](https://github.com/valgaze/speedybot-hub/blob/deploy/settings/handlers.ts)** (And if you need further customization like supporting multiple languages, **[prompting users for permissions](https://github.com/valgaze/speedybot-hub/blob/deploy/docs/assets/demo_location.gif), **[validating webhook secrets](https://developer.webex.com/blog/building-a-more-secure-bot)**, etc see **[settings/config.ts](https://github.com/valgaze/speedybot-hub/blob/deploy/settings/config.ts)\*\* )
-
-### Special "magic" keywords
-
-The era of manually writing "handlers" or matching text with RegEx's is largely over. These days in order to build a credible conversation experience with conversation designers and other experts you will probably need to separate your authorship from code. We will be writing less "keyword" handlers and instead integrate with 3rd-party conversation services like **[Voiceflow](https://www.voiceflow.com/)**, **[Amazon Lex](https://aws.amazon.com/lex/)**, **[DialogFlow](https://cloud.google.com/dialogflow/docs)** You can of course still write regex's or manually match keywords, but you really don't need to anymore.
-
-- <@catchall> (runs on every received message, useful when "passing" chat messages an NLU service and getting a response)
-- <@submit> (capture the result of an **[AdaptiveCard](https://developer.webex.com/docs/api/guides/cards)** form submission)
-- <@fileupload> (triggers when files uploaded-- `$bot.getFile` name and lots of other data
-- <@nomatch> (runs when no handler, aside from <@catchall>, matches the input)
-
-See the **[quickstart](./quickstart.md)** to get up and running
-
-## SpeedyCard
-
-ex. Tell the bot "sendcard" to get a card, type into the card & tap submit, catch submission using _<@submit>_ and echo back to user.
-
-This card builder simplifies and standardizes cards
-
-![sb](./docs/assets/demo_sendcard.gif)
-
-```ts
-export const handlers = [
-  {
-    keyword: '<@submit>',
-    handler(bot, trigger) {
-      bot.say(
-        `Submission received! You sent us ${JSON.stringify(
-          trigger.attachmentAction.inputs
-        )}`
-      )
-    },
-    helpText: 'Special handler that fires when data is submitted',
-  },
-  {
-    keyword: 'sendcard',
-    handler($bot, trigger) {
-      $bot.say('One card on the way...')
-      // Adapative Card: https://developer.webex.com/docs/api/guides/cards
-      const cardData = $bot
-        .card({
-          title: 'System is 👍',
-          subTitle: 'If you see this card, everything is working',
-          image:
-            'https://raw.githubusercontent.com/valgaze/speedybot/master/docs/assets/chocolate_chip_cookies.png',
-          url: 'https://www.youtube.com/watch?v=3GwjfUFyY6M',
-          urlLabel: 'Take a moment to celebrate',
-          table: [
-            [`Bot's Date`, new Date().toDateString()],
-            ["Bot's Uptime", '135.327998958s'],
-          ],
-        })
-        .setInput(`What's on your mind?`)
-        .setData({ mySpecialData: { a: 1, b: 2 } })
-
-      $bot.send(cardData)
-    },
-    helpText: 'Sends an Adaptive Card with an input field to the user',
-  },
-]
+git clone https://github.com/valgaze/speedybot-hub
+cd speedybot-hub
+git checkout lambda
+npm run setup
 ```
 
-## Suggestion "chips"
+## 2. Set your bot access token
 
-ex. Tap a "suggestion" to chip to trigger same behavior as if you tapped it yourself
+- If you have an existing bot, get its token here: **[https://developer.webex.com/my-apps](https://developer.webex.com/my-apps)**
 
-Chips are useful to expose conversation agent features--
+- If you don't have a bot, create one and save the token from here: **[https://developer.webex.com/my-apps/new/bot](https://developer.webex.com/my-apps/new/bot)**
 
-![sb](./docs/assets/demo_chips.gif)
+- Once you have the bot's token, save it to **[settings/config.ts](./settings/config.ts)** under the `token` field
 
-```ts
-export const handlers = [
-  {
-    keyword: '<@submit>',
-    handler(bot, trigger) {
-      bot.say(
-        `Submission received! You sent us ${JSON.stringify(
-          trigger.attachmentAction.inputs
-        )}`
-      )
-    },
-    helpText: 'Special handler that fires when data is submitted',
-  },
-  {
-    keyword: 'sendcard',
-    handler($bot, trigger) {
-      bot.say('One card on the way...')
-      // Adapative Card: https://developer.webex.com/docs/api/guides/cards
-      const cardData = $bot
-        .card({
-          title: 'System is 👍',
-          subTitle: 'If you see this card, everything is working',
-          image:
-            'https://raw.githubusercontent.com/valgaze/speedybot/master/docs/assets/chocolate_chip_cookies.png',
-          url: 'https://www.youtube.com/watch?v=3GwjfUFyY6M',
-          urlLabel: 'Take a moment to celebrate',
-          table: [
-            [`Bot's Date`, new Date().toDateString()],
-            ["Bot's Uptime", '135.327998958s'],
-          ],
-        })
-        .setInput(`What's on your mind?`)
-        .setData({ mySpecialData: { a: 1, b: 2 } })
+Alternatively you can save it in the **[.env](./env)** under the `token` field
 
-      $bot.send(cardData)
-    },
-    helpText: 'Sends an Adaptive Card with an input field to the user',
-  },
-]
+## 3. Set up your AWS credentials on your machine
+
+Note: You'll need an AWS account that has authorization/billing to create lambda functions
+
+3a. Setup IAM here: https://sst.dev/chapters/create-an-iam-user.html
+
+3b. Setup AWS CLI: https://sst.dev/chapters/configure-the-aws-cli.html
+
+## 4. Boot your Bot & get its public url
+
+Start local websocket mode by running
+
+```sh
+npm start
 ```
+
+If deployment is successful, you should find that your url that looks something like this: https://abcd123456.execute-api.us-east-1.amazonaws.com
+
+Note: This uses SST's **[Live Lambda Development feature](https://docs.sst.dev/live-lambda-development)**
+
+## 4. Register webhooks using Speedybot Garage
+
+In order to receive messages, you'll need to register your agent's URL to receive webhooks for chat.
+
+Try using **[Speedybot bot-garag 🔧🤖](https://codepen.io/valgaze/full/MWVjEZV)**, (source available for inspection **[here](https://github.com/valgaze/speedybot-hub/blob/lambda/settings/speedybot_garage.html)**) and select "webhooks" after registering your token
+
+![image](./docs/assets/speedybot_garage_demo.gif)
+
+## 4b. (Alternative) Register webhooks using the command line
+
+In a terminal enter the following command:
+
+- Replace t argument with your token
+- Replce w argument with your lambda url
+
+```sh
+npm init -y speedybot webhook create -- -t _token_here_ -w https://abcd123456.execute-api.us-east-1.amazonaws.com
+```
+
+Tip: If you're having trouble, you can enter your token & URL step by step by entering `npm init -y speedybot webhook create`
+
+## 5. Take it for a spin
+
+To make sure all is well, add your bot from Step 1 in a 1-1 chat session and tell it "healthcheck"-- if everything is configured properly you should see something like this:
+
+![image](https://raw.githubusercontent.com/valgaze/speedybot/master/docs/assets/healthcheck.gif)
+
+## 6. Deploy
+
+Once your agent is just the way you want it, securely expose your **[access token as a secret](https://sst.dev/chapters/handling-secrets-in-sst.html)** and deploy using this command:
+
+```
+npm run deploy
+```
+
+## Issues
+
+### Potential issues/bugs 🐞🪲
+
+1. "cold-start" problem
+
+- This is an issue that does not affect Workers/V8 Isolates (see the **[deploy branch](https://github.com/valgaze/speedybot-hub/blob/deploy/quickstart.md)** for an implementation using Workers/V8-Isolates)
+
+- Various solutions available like provisioned concurrency, various tune-ups & tricks
+
+2. ~"doubling" problem~
+
+- Not consistent: Occassionally a command needs to be sent twice in order to provoke a response from the agent-- unclear why (would never occur when running locally w/ `npm start`)

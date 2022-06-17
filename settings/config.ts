@@ -1,7 +1,6 @@
-import { SpeedyConfig, LocationAwareBot } from '../src/lib/'
-
+// Root config-- locales, validation, location handler, etc
 export const config: SpeedyConfig = {
-  token: 'placeholder', // 🚨 Given our infra, this will be replaced with BOT_TOKEN secret using with wrangler cli/github secrets
+  token: process.env.token as string, // Can use process, secrets/credentials manager, etc
   locales: {
     es: {
       greetings: {
@@ -14,42 +13,22 @@ export const config: SpeedyConfig = {
       },
     },
   },
-  async validate(request) {
-    /*
-     *  Here could run validation for webook secret, ex
-     *  Ex. Register webhook with a secret: $ npm init speedybot webhook create -- -t bot_token_here -w https://speedybot-hub.username.workers.dev -s secret_here
+  async validate(body: any, event: APIGatewayProxyEventV2, ctx: Context) {
+    // Here could check for secret, headers, etc
+    /**
+     *  Ex. Visual webhook editor: https://codepen.io/valgaze/full/MWVjEZV
+     *  Ex. Register webhook with a secret: $ npm init speedybot webhook create -- -t bot_token_here -w https://abcder1234.execute-api.us-east-1.amazonaws.com -s secret_here
      *  https://github.com/webex/SparkSecretValidationDemo
      *  https://developer.webex.com/blog/using-a-webhook-secret
      *  https://developer.webex.com/blog/building-a-more-secure-bot
-     *  ex
-     *  const signature = request.headers.get('X-Spark-Signature')
-     *  const json = await request.json()
-     *  // if valid return { proceeed: true}
      *
      **/
     return { proceed: true }
-  },
-  async location($bot: LocationAwareBot) {
-    // Only here you have $bot.location
-    $bot.send(
-      $bot
-        .card({
-          title: `Good ${$bot.location.tod}`,
-          subTitle: `Note: this timezone + location data is not stored/collected/sold and is not hyper-accurate. It's accurate enough to understand if its dark/light outside whenever a user is located`,
-        })
-        .setTable([
-          ['Country', $bot.location.country as string],
-          ['City', $bot.location.city as string],
-          ['Region', $bot.location.region as string],
-          ['Timezone', $bot.location.timezone as string],
-        ])
-        .setUrl(
-          `https://maps.google.com/?q=${$bot.location.latitude},${$bot.location.longitude}`,
-          'See map 🗺'
-        )
-    )
   },
   debug: true,
   fallbackText:
     'Sorry, it does not appear your client supports rendering cards',
 }
+
+import { APIGatewayProxyEventV2, Context } from 'aws-lambda'
+import { SpeedyConfig } from '../lib/'

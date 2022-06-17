@@ -20,9 +20,11 @@ If you follow this guide you will end up with zero-config agent/repo where anyti
 
 - If you don't have one already, get a **[cloudflare account](https://dash.cloudflare.com/sign-up)**
 
-- Create a new "worker" from the **[cloudflare dashboard](https://dash.cloudflare.com)** (you want "HTTP Handler" when asked) and name it speedybot-hub
+- Create a new "worker" from the **[cloudflare dashboard](https://dash.cloudflare.com)** (you want "HTTP Handler" when asked) and name it "speedybot-hub"
 
-- When your done, ther service will typically be named something like https://speedybot-hub.username.workers.dev)
+- Your URL should look roughly this: https://speedybot-hub.username.workers.dev
+
+- **Note:** If you want to use a different name, make sure to update the **name** field in the root **[wrangler.toml fiile](./../wrangler.toml)**
 
 ## 3. Get your account Id
 

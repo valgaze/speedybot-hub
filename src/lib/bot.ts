@@ -1,4 +1,4 @@
-import { SpeedyCard } from './index'
+import { SpeedyCard } from './cards'
 import {
   makeRequest as CoreMakerequest,
   checkers,
@@ -37,7 +37,8 @@ export type AbbreviatedSpeedyCard = {
   urlLabel: string
   data: AttachmentData
   chips: (string | { label: string; keyword?: string })[]
-  table: string[][] | { [key: string]: string | number }
+  table: string[][] | { [key: string]: string }
+  choices: (string | number)[]
 }
 
 export class BotRoot {
@@ -352,6 +353,7 @@ export class BotRoot {
       data = {},
       chips = [],
       table = [],
+      choices = [],
     } = config
 
     if (title) {
@@ -380,6 +382,10 @@ export class BotRoot {
 
     if (chips.length) {
       card.setChips(chips)
+    }
+
+    if (choices.length) {
+      card.setChoices(choices)
     }
 
     if (table) {
@@ -977,13 +983,16 @@ export function InitBot(
 
 /**
  *
- * Bot instance to handle incoming webhooks. This operates outside of a room context
+ * Bot instance to handle incoming webhooks. The basic is receive an incoming webhook, process the data and if necessary dispatch an alert to a person and/or a room (group of persons)
  *
  * Your Hub (under src/index.ts) can specify "hooks" which handle incoming webhooks and
  * WebhookBot will let you dispatch alert messages to spaces or DM's to people
  *
  * ```typescript
- *     const hooks: Hooks = {
+ *
+ * export default {
+ *  async fetch(request: Request, env: any, ctx: any): Promise<Response> {
+ *    const hooks: Hooks = {
  *     '/incoming_route': {
  *       async handler(request, env, ctx) {
  *         const BotConfig: Partial<BotConfig> = {
@@ -998,15 +1007,15 @@ export function InitBot(
  *         //Send a card
  *         $bot.sendRoom('__PUT_ROOM_ID_HERE',$bot.card({title: 'hi there', subtitle: 'here is a subittle', chips: ['a','b','c']}))
  *
- *
  *         const data = await request.data()
  *
  *         $bot.DM('username@email.com', `This was just posted to /incoming_route: ${JSON.stringify(data, null, 2)}`)
  *       },
  *     }
+ *    }
+ * }
  *
  * ```
- *
  */
 export function WebhookBot(
   config: Partial<BotConfig>,

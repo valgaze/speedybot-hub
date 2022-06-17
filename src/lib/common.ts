@@ -178,7 +178,42 @@ export type Hooks = {
 /**
  * Guard to put as the front door to V8 isolate & route requests as needed
  *
- * @param hooks
+ * /**
+ *
+ * Bot instance to handle incoming webhooks. The basic is receive an incoming webhook, process the data and if necessary dispatch an alert to a person and/or a room (group of persons)
+ *
+ * Your Hub (under src/index.ts) can specify "hooks" which handle incoming webhooks and
+ * WebhookBot will let you dispatch alert messages to spaces or DM's to people
+ *
+ * ```typescript
+ *
+ * export default {
+ *  async fetch(request: Request, env: any, ctx: any): Promise<Response> {
+ *    const hooks: Hooks = {
+ *     '/incoming_route': {
+ *       async handler(request, env, ctx) {
+ *         const BotConfig: Partial<BotConfig> = {
+ *           token: config.token,
+ *           url: request.url,
+ *           helpContent: [],
+ *         }
+ *         const $bot = WebhookBot(BotConfig)
+ *         // send a message to a room
+ *         $bot.sendRoom('__PUT_ROOM_ID_HERE', 'Some great message or card')
+ *
+ *         //Send a card
+ *         $bot.sendRoom('__PUT_ROOM_ID_HERE',$bot.card({title: 'hi there', subtitle: 'here is a subittle', chips: ['a','b','c']}))
+ *
+ *         const data = await request.data()
+ *
+ *         $bot.DM('username@email.com', `This was just posted to /incoming_route: ${JSON.stringify(data, null, 2)}`)
+ *       },
+ *     }
+ *    }
+ *      return SpeedyGuard(hooks, request, env, ctx)
+ * }
+ *
+ * ```
  */
 export const SpeedyGuard = async <T = any>(
   hooks: Hooks,

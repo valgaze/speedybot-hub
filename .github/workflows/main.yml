@@ -17,6 +17,11 @@ jobs:
       HOST: ${{ secrets.HOST }}
     steps:
       - uses: actions/checkout@v2
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 14
+      - run: npm ci
+      - run: npm test
       - name: Run tests (expects handlers.ts in settings/)
         if: "${{ env.SKIP_TESTS != 'yes' }}"
         run: npm test

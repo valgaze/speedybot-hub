@@ -1,5 +1,8 @@
 {
   "name": "speedybot-hub",
+  "bin": {
+    "speedybot-hub": "./cli/cli.js"
+  },
   "version": "1.0.0",
   "devDependencies": {
     "@babel/core": "^7.18.2",

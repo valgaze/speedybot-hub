@@ -21,7 +21,6 @@ jobs:
         with:
           node-version: 14
       - run: npm ci
-      - run: npm test
       - name: Run tests (expects handlers.ts in settings/)
         if: "${{ env.SKIP_TESTS != 'yes' }}"
         run: npm test

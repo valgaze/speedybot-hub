@@ -10,9 +10,13 @@
 tl:dr; serverless chat that actually works
 ```
 
+Speedybot-hub is a zero-config and really fast central "hub" for all your conversation design needs-- especially rich 3rd-party integrations, incoming webhooks, handling files/photos, etc.
+
+## Get up and running
+
 See **[quickstart.md](./quickstart.md)** on how to get up and running fast
 
-Speedybot-hub is a zero-config and really fast central "hub" for all your conversation design needs-- especially rich 3rd-party integrations, incoming webhooks, handling files/photos, etc.
+Alternatively, go ahead and **[🍴Fork this repo🍴](https://github.com/valgaze/speedybot-hub/blob/deploy/docs/fork_guide.md)** for a zero-effort that'll take care of almost everything for you.
 
 ## Features
 

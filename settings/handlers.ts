@@ -7,9 +7,9 @@ export const handlers: BotHandler[] = [
       const utterances = [
         `Heya how's it going $[name]?`,
         `Hi there, $[name]!`,
-        `Hiya $[name]`,
-        `What's new $[name]`,
-        `Helllooo $[name]`,
+        `Hiya $[name]!`,
+        `What's new $[name]?`,
+        `Helllooo $[name]!`,
       ]
       const template = {
         name: trigger.person.displayName,

@@ -38,7 +38,7 @@ Speedybot-hub takes care of virtually all of the "everything else" so all you an
 
 ### Special "magic" keywords
 
-The era of manually writing "handlers" or matching text with RegEx's is coming to an end. In the futrue there will be far fewer "keyword" handlers and instead deeper integration with 3rd-party conversation services like **[Voiceflow](https://www.voiceflow.com/)**, **[Amazon Lex](https://aws.amazon.com/lex/)**, **[DialogFlow](https://cloud.google.com/dialogflow/docs)**
+The era of manually writing "handlers" or matching text with RegEx's is coming to an end. In the future there will be far fewer "keyword" handlers and instead deeper integration with 3rd-party conversation services like **[Voiceflow](https://www.voiceflow.com/)**, **[Amazon Lex](https://aws.amazon.com/lex/)**, **[DialogFlow](https://cloud.google.com/dialogflow/docs)**
 
 Some things can't/shoudn't live inisde an NLU, these magic keywords allow you to hook into platform-specific details:
 

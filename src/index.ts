@@ -16,7 +16,6 @@ import {
   Hooks,
   websiteResponse,
   finale,
-  ui_html,
   colorGenerator,
 } from './lib/common'
 export { InitBot, WebhookBot } from './lib/bot'
@@ -217,13 +216,13 @@ export default {
         },
       },
       '/ui': (request: Request) => {
-        return new Response(ui_html, {
-          status: 200,
-          headers: {
-            'content-type': 'text/html;charset=UTF-8',
-          },
-        })
-        // return Response.redirect('https://codepen.io/valgaze/full/PoEpxpb')
+        // return new Response(ui_html, {
+        //   status: 200,
+        //   headers: {
+        //     'content-type': 'text/html;charset=UTF-8',
+        //   },
+        // })
+        return Response.redirect('https://codepen.io/valgaze/full/PoEpxpb')
       },
       '/location': async (
         request: Request,

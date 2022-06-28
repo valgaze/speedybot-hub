@@ -3,6 +3,107 @@
 
 export const handlers: BotHandler<BotEnvs>[] = [
   {
+    keyword: 'announce_dm',
+    async handler($bot, trigger) {
+      $bot.dm(
+        trigger.personId,
+        $bot
+          .card({
+            title: '🏝 Speedybot-hub',
+            subTitle:
+              'speedybot-hub: zero fuss serverless conversational design infra',
+            chips: [
+              { keyword: 'alert', label: 'Show alert types' },
+              'ping',
+              'pong',
+              'hi',
+              'help',
+              'files',
+              { label: 'location', keyword: 'location' },
+            ],
+            image: 'https://i.imgur.com/LybLW7J.gif',
+          })
+          .setDetail(
+            $bot
+              .card()
+              .setText('Other Resources')
+              .setText(
+                '📚 Read **[The API Docs](https://github.com/valgaze/speedybot-hub/blob/deploy/api-docs/classes/BotRoot.md#class-botroott)**'
+              )
+              .setText(
+                '⌨️ See **[The source code for this agent](https://github.com/valgaze/speedybot-hub/blob/deploy/settings/handlers.ts)**'
+              )
+              .setText(
+                '**[🍦 Talk to "Treatbot" & order ice cream](webexteams://im?email=treatbot@webex.bot)**'
+              )
+              .setText(
+                '**[🗣 Get help](webexteams://im?space=6d124c80-f638-11ec-bc55-314549e772a9)**'
+              ),
+            'Get Help🚨'
+          )
+      )
+    },
+  },
+  {
+    keyword: 'announce',
+    async handler($bot) {
+      const announce = $bot
+        .skyCard({
+          title: '🏝 Speedybot-hub (serverless bots that finally work!)',
+          subTitle:
+            'speedybot-hub: zero fuss serverless conversational design infra',
+          chips: [{ label: '🚀 Show me a demo', keyword: 'announce_dm' }],
+          image: 'https://i.imgur.com/LybLW7J.gif',
+          table: {
+            '🌟': 'Zero External Dependencies, 100% typescript',
+            '💥': 'FAST- runs on V8 Isolates not containers or nodejs',
+            '🧭': '(New!) Location permissions prompt',
+            '🎨': '(New!) Colorful cards-- dangerCard, successCard, warningCard',
+            '🤖': 'Easy integration with NLU (voiceflow, dialogflow, etc)',
+            '🪄': `"Magic" keywords to handle events like <@fileupload>, <@nomatch>, <@botadded>, <@catchall>`,
+            '🚫': `"No-Ops" zero-config approach to provisioning, managing, scaling infra`,
+          },
+        })
+        .setUrl('https://github.com/valgaze/speedybot-hub')
+        .setUrlLabel('💫 See the code + quickstart')
+        .setDetail(
+          $bot
+            .card()
+            .setText('Other Resources')
+            .setText(
+              '🤖 See **[The starter repo and make your own](https://github.com/valgaze/speedybot-hub/blob/deploy/settings/handlers.ts)**'
+            )
+            .setText(
+              '📚 Read **[The API Docs](https://github.com/valgaze/speedybot-hub-draft/blob/wow/api-docs/classes/BotRoot.md#class-botroott)**'
+            )
+            .setText(
+              '[🍦 Talk to "Treatbot" & order iecream](webexteams://im?email=treatbot@webex.bot)'
+            )
+            .setText(
+              '[🗣 Get help](webexteams://im?space=6d124c80-f638-11ec-bc55-314549e772a9)'
+            )
+            .setInput('Add any feedback here (not shared in group spaces)', {
+              isMultiline: true,
+              id: 'action:add_comment',
+            }),
+          'Get Help🚨'
+        )
+      // Flag prefix
+      const b = $bot.skyCard({ title: 'Speedybot-Hub' })
+      const r = $bot.dangerCard({ title: 'Speedybot-Hub' })
+      const g = $bot.successCard({ title: 'Speedybot-Hub' })
+      const y = $bot.warningCard({ title: 'Speedybot-Hub' })
+      await Promise.all([
+        $bot.send(b),
+        $bot.send(r),
+        $bot.send(g),
+        $bot.send(y),
+      ])
+
+      $bot.send(announce)
+    },
+  },
+  {
     keyword: ['hi', 'hello', 'hey', 'yo', 'watsup', 'hola'],
     async handler($bot, trigger: any) {
       const utterances = [
@@ -402,11 +503,17 @@ ${JSON.stringify(trigger, null, 2)}
   {
     keyword: '<@submit>',
     handler($bot, trigger: any) {
-      $bot.say(
-        `Submission received! You sent us ${JSON.stringify(
-          trigger.attachmentAction.inputs
-        )}`
-      )
+      const comment = trigger.attachmentAction.inputs['action:add_comment']
+      if (comment) {
+        const id = trigger.personId
+        $bot.dm(id, `Recorded your remarks *'${comment}'*`)
+      } else {
+        $bot.say(
+          `Submission received! You sent us ${JSON.stringify(
+            trigger.attachmentAction.inputs
+          )}`
+        )
+      }
     },
   },
 ]

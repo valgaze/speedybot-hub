@@ -34,7 +34,7 @@ Alternatively, go ahead and **[🍴Fork this repo🍴](https://github.com/valgaz
 
 Think of a "hubs" as a central spots around which all your conversation design infrastructure + integrations + webhooks + all the rest can gather. You shouldn't have to think about anything but what matters in a conversation-- (1) the content + (2) useful/labor-savings rich integrations (files, location, sensors, etc)
 
-Speedybot-hub takes care of virtually all of the "everything else" so all you and your team need to think about is about a single file, handlers.ts: **[settings/handlers.ts](https://github.com/valgaze/speedybot-hub/blob/deploy/settings/handlers.ts)** (And if you need further customization like supporting multiple languages, **[prompting users for permissions](https://github.com/valgaze/speedybot-hub/blob/deploy/docs/assets/demo_location.gif), **[validating webhook secrets](https://developer.webex.com/blog/building-a-more-secure-bot)**, etc see **[settings/config.ts](https://github.com/valgaze/speedybot-hub/blob/deploy/settings/config.ts)\*\* )
+Speedybot-hub takes care of virtually all of the "everything else" so all you and your team need to think about is about a single file, handlers.ts: [settings/handlers.ts](https://github.com/valgaze/speedybot-hub/blob/deploy/settings/handlers.ts) And if you need further customization like supporting multiple languages, [prompting users for permissions](https://github.com/valgaze/speedybot-hub/blob/deploy/docs/assets/demo_location.gif), [validating webhook secrets](https://developer.webex.com/blog/building-a-more-secure-bot), etc see [settings/config.ts](https://github.com/valgaze/speedybot-hub/blob/deploy/settings/config.ts)
 
 ### Special "magic" keywords
 

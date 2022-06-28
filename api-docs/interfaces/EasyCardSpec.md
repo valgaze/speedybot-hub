@@ -21,7 +21,7 @@
 
 #### Defined in
 
-[lib/cards.ts:588](https://github.com/valgaze/speedybot-hub/blob/c3263c6/src/lib/cards.ts#L588)
+[lib/cards.ts:588](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/cards.ts#L588)
 
 ___
 
@@ -31,7 +31,7 @@ ___
 
 #### Defined in
 
-[lib/cards.ts:592](https://github.com/valgaze/speedybot-hub/blob/c3263c6/src/lib/cards.ts#L592)
+[lib/cards.ts:592](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/cards.ts#L592)
 
 ___
 
@@ -41,7 +41,7 @@ ___
 
 #### Defined in
 
-[lib/cards.ts:593](https://github.com/valgaze/speedybot-hub/blob/c3263c6/src/lib/cards.ts#L593)
+[lib/cards.ts:593](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/cards.ts#L593)
 
 ___
 
@@ -51,7 +51,7 @@ ___
 
 #### Defined in
 
-[lib/cards.ts:591](https://github.com/valgaze/speedybot-hub/blob/c3263c6/src/lib/cards.ts#L591)
+[lib/cards.ts:591](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/cards.ts#L591)
 
 ___
 
@@ -61,7 +61,7 @@ ___
 
 #### Defined in
 
-[lib/cards.ts:589](https://github.com/valgaze/speedybot-hub/blob/c3263c6/src/lib/cards.ts#L589)
+[lib/cards.ts:589](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/cards.ts#L589)
 
 ___
 
@@ -71,4 +71,4 @@ ___
 
 #### Defined in
 
-[lib/cards.ts:590](https://github.com/valgaze/speedybot-hub/blob/c3263c6/src/lib/cards.ts#L590)
+[lib/cards.ts:590](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/cards.ts#L590)

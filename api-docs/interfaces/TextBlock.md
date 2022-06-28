@@ -30,7 +30,7 @@
 
 #### Defined in
 
-[lib/cards.ts:45](https://github.com/valgaze/speedybot-hub/blob/c3263c6/src/lib/cards.ts#L45)
+[lib/cards.ts:45](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/cards.ts#L45)
 
 ___
 
@@ -40,7 +40,7 @@ ___
 
 #### Defined in
 
-[lib/cards.ts:53](https://github.com/valgaze/speedybot-hub/blob/c3263c6/src/lib/cards.ts#L53)
+[lib/cards.ts:53](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/cards.ts#L53)
 
 ___
 
@@ -54,7 +54,7 @@ ___
 
 #### Defined in
 
-[lib/cards.ts:24](https://github.com/valgaze/speedybot-hub/blob/c3263c6/src/lib/cards.ts#L24)
+[lib/cards.ts:24](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/cards.ts#L24)
 
 ___
 
@@ -64,7 +64,7 @@ ___
 
 #### Defined in
 
-[lib/cards.ts:54](https://github.com/valgaze/speedybot-hub/blob/c3263c6/src/lib/cards.ts#L54)
+[lib/cards.ts:54](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/cards.ts#L54)
 
 ___
 
@@ -78,7 +78,7 @@ ___
 
 #### Defined in
 
-[lib/cards.ts:25](https://github.com/valgaze/speedybot-hub/blob/c3263c6/src/lib/cards.ts#L25)
+[lib/cards.ts:25](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/cards.ts#L25)
 
 ___
 
@@ -88,7 +88,7 @@ ___
 
 #### Defined in
 
-[lib/cards.ts:44](https://github.com/valgaze/speedybot-hub/blob/c3263c6/src/lib/cards.ts#L44)
+[lib/cards.ts:44](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/cards.ts#L44)
 
 ___
 
@@ -98,7 +98,7 @@ ___
 
 #### Defined in
 
-[lib/cards.ts:43](https://github.com/valgaze/speedybot-hub/blob/c3263c6/src/lib/cards.ts#L43)
+[lib/cards.ts:43](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/cards.ts#L43)
 
 ___
 
@@ -108,7 +108,7 @@ ___
 
 #### Defined in
 
-[lib/cards.ts:55](https://github.com/valgaze/speedybot-hub/blob/c3263c6/src/lib/cards.ts#L55)
+[lib/cards.ts:55](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/cards.ts#L55)
 
 ___
 
@@ -118,4 +118,4 @@ ___
 
 #### Defined in
 
-[lib/cards.ts:56](https://github.com/valgaze/speedybot-hub/blob/c3263c6/src/lib/cards.ts#L56)
+[lib/cards.ts:56](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/cards.ts#L56)

@@ -1,6 +1,3 @@
-// Main handler file, just add to the list below
-// Special keywords: '<@submit>, <@catchall>, <@nomatch>, <@fileupload>
-
 export const handlers: BotHandler<BotEnvs>[] = [
   {
     keyword: ['hi', 'hello', 'hey', 'yo', 'watsup', 'hola'],
@@ -23,22 +20,27 @@ export const handlers: BotHandler<BotEnvs>[] = [
           subTitle:
             'speedybot-hub: zero fuss serverless conversational design infra',
           chips: [
-            { keyword: 'alert', label: 'Show alert types' },
-            'ping',
-            'pong',
-            'hi',
-            'help',
-            'files',
-            { label: 'location', keyword: 'location' },
+            { keyword: 'alert', label: '📱 Show alert types' },
+            { keyword: 'ping', label: 'ping 🏓' },
+            { keyword: 'pong', label: '🏓 pong' },
+            { keyword: 'yo', label: '🔆 hi' },
+            { keyword: 'kitchensink', label: '💯 Everything (warning: fast)' },
+            { keyword: 'help', label: '🚒 help' },
+            { keyword: 'files', label: '🗂 files' },
+            { keyword: 'location', label: '🗺 location' },
           ],
           image: 'https://i.imgur.com/LybLW7J.gif',
         })
+        .setText(
+          '**[\u{1F366} [new] Talk to "Treatbot" & order ice cream](webexteams://im?email=treatbot@webex.bot)**'
+        )
+        .setText('Pick one of the options below')
         .setDetail(
           $bot
             .card()
             .setText('Other Resources')
             .setText(
-              '📚 Read **[The API Docs](https://github.com/valgaze/speedybot-hub/blob/deploy/api-docs/classes/BotRoot.md#class-botroott)**'
+              '📚 Read **[The API Docs](https://github.com/valgaze/speedybot-hub/blob/deploy/api-docs/classes/BotRoot.md#methods)**'
             )
             .setText(
               '⌨️ See **[The source code for this agent](https://github.com/valgaze/speedybot-hub/blob/deploy/settings/handlers.ts)**'
@@ -53,6 +55,151 @@ export const handlers: BotHandler<BotEnvs>[] = [
         )
 
       $bot.send(card)
+    },
+  },
+  {
+    keyword: ['ping', 'pong'],
+    async handler($bot, trigger) {
+      const normalized = trigger.text.toLowerCase()
+      if (normalized === 'ping') {
+        $bot.say('pong')
+      } else {
+        $bot.say('ping')
+      }
+    },
+    helpText: `A handler that says ping when the user says pong and vice versa`,
+  },
+  {
+    keyword: /\b(\w*rabbit\w*)\b/g,
+    handler($bot, trigger) {
+      /**
+       *
+       * User says: "rabbit I want cheese"
+       * Bot catures trigger.args as ["i","want","cheese"]
+       *
+       */
+      $bot.send(JSON.stringify(trigger.args))
+      $bot.send(`You asked for help and said: ${trigger.args.join(' ')}`)
+    },
+    helpText: `🐇 This is a regex-based handler that can match a variety of inputs based on the word rabbit-- start your command w/ the word "rabbit" like this: "rabbit i want a carrot"`,
+  },
+  {
+    keyword: '<@catchall>',
+    async handler($bot, trigger) {
+      const { text } = trigger
+      // Usually use this to connec to NLU, see https://github.com/valgaze/treatbot for an examplw
+      $bot.log(
+        `This fires on **EVERY** incoming text message, ex the user just entered '${text}'`
+      )
+    },
+  },
+  {
+    keyword: '<@nomatch>',
+    async handler($bot, trigger: any) {
+      const utterances = [
+        `Sorry, I don't know what '$[text]' means`,
+        `Whoops, this agent doesn't support '$[text]'`,
+        `'$[text]' is not a supported command`,
+      ]
+      const template = {
+        text: trigger.message.text,
+      }
+
+      $bot.sendTemplate(utterances, template)
+    },
+  },
+  {
+    keyword: '<@fileupload>',
+    hideHelp: true,
+    async handler($bot, trigger: any) {
+      $bot.say('You uploaded a file')
+      const [fileUrl] = trigger.message.files || []
+      const fileData = await $bot.getFile(fileUrl, {
+        responseType: 'arraybuffer',
+      })
+      const { fileName, extension, type } = fileData
+      $bot.say(
+        `The file you uploaded (${fileName}), is a ${extension} file of type ${type}`
+      )
+    },
+    helpText:
+      'This is a special handler that fires whenever a file is uploaded',
+  },
+  {
+    keyword: '<@submit>',
+    hideHelp: true,
+    handler($bot, trigger: any) {
+      $bot.send(
+        `Submission received! You sent us ${JSON.stringify(
+          trigger.attachmentAction.inputs
+        )}`
+      )
+      if (trigger.attachmentActions.inputs?.action === 'delete_card') {
+        $bot.send(trigger.attachmentAction.messageId)
+        $bot.deleteMessage(trigger.attachmentAction.messageId)
+      }
+    },
+    helpText:
+      'This is a special hander that fires whenever a button is pressed on an Adaptive Card',
+  },
+  {
+    keyword: '<@camera>',
+    async handler($bot, trigger: FILE_TRIGGER) {
+      // Same as <@fileupload>, but triggers specifically for jpeg, jpg, png, etc
+      const [fileUrl] = trigger.message.files || []
+      const fileData = await $bot.getFile(fileUrl, {
+        responseType: 'arraybuffer',
+      })
+      const { data } = fileData
+      try {
+        // Run image recognition
+        const detector = $bot.imageDetector($bot.env.VISION_TOKEN)
+
+        // 1) convert array buffer to base64
+        const base64 = detector.toBase64(data)
+
+        // 2) transmit data and retrieve labels
+        const res = await detector.detect(base64)
+
+        if ('error' in res && res.error.code === 401) {
+          const err = new Error()
+          err.message = 'VISION_TOKEN is invalid'
+          throw err
+        } else if ('responses' in res) {
+          // 3) Create a single list of all detections
+          const simplified = detector.simplify(res)
+
+          await $bot.send(`Here are some detections...`)
+          $bot.sendSnippet(simplified)
+        }
+      } catch (e: any) {
+        await $bot.send('There was a catastrophic issue with the vision tool')
+        $bot.send(
+          $bot
+            .dangerCard({
+              title: 'Vision is not enabled for this agent',
+              subTitle: e.message ? e.message : 'Vision service has issues',
+            })
+            .setDetail(
+              $bot
+                .card()
+                .setText('Other Resources')
+                .setText(
+                  '📚 Read **[The API Docs](https://github.com/valgaze/speedybot-hub/blob/deploy/api-docs/classes/BotRoot.md#methods)**'
+                )
+                .setText(
+                  '⌨️ See **[The source code for this agent](https://github.com/valgaze/treatbot/blob/deploy/settings/handlers.ts)**'
+                )
+                .setText(
+                  '**[🍦 Talk to "Speedybot"](webexteams://im?email=speedybot@webex.bot)**'
+                )
+                .setText(
+                  '**[🗣 Get help](webexteams://im?space=6d124c80-f638-11ec-bc55-314549e772a9)**'
+                ),
+              'Get Help🚨'
+            )
+        )
+      }
     },
   },
   {
@@ -121,7 +268,7 @@ export const handlers: BotHandler<BotEnvs>[] = [
           }),
           'Incident Details'
         )
-      $bot.send(danger)
+      await $bot.send(danger)
 
       const warning = $bot.warningCard({
         title:
@@ -130,26 +277,30 @@ export const handlers: BotHandler<BotEnvs>[] = [
           'There is a very important reason to slow down and consider if you want to do that...or not',
         chips: ['ping', 'pong'],
       })
-      $bot.send(warning)
+      await $bot.send(warning)
 
       const success = $bot.successCard({
         title: '🌟You did it!🎉',
         subTitle: 'Whatever you did, good at job at doing it',
         chips: ['ping', 'pong'],
       })
-      $bot.send(success)
+      await $bot.send(success)
 
       const sky = $bot.skyCard({
         title: "☁️You're doing it☁️",
         subTitle: "Whatever you're doing, do it more",
         chips: ['ping', 'pong'],
       })
-      $bot.send(sky)
+      await $bot.send(sky)
 
-      const $peedy = $bot.skyCard({
-        title: 'Speedybot-- nice banner',
-      })
-      $bot.send($peedy)
+      const b = $bot.skyCard({ title: 'Speedybot-Hub' })
+      const r = $bot.dangerCard({ title: 'Speedybot-Hub' })
+      const g = $bot.successCard({ title: 'Speedybot-Hub' })
+      const y = $bot.warningCard({ title: 'Speedybot-Hub' })
+      await $bot.send(b)
+      await $bot.send(r)
+      await $bot.send(g)
+      await $bot.send(y)
     },
   },
   {
@@ -163,7 +314,9 @@ export const handlers: BotHandler<BotEnvs>[] = [
             String(idx),
             `${label}: ${helpText}`,
           ]),
-          chips: help.map(({ label }) => label),
+          chips: help
+            .filter(({ label }) => label !== '{regex}')
+            .map(({ label }) => label),
         })
       )
     },
@@ -178,6 +331,7 @@ export const handlers: BotHandler<BotEnvs>[] = [
   },
   {
     keyword: '$clear',
+    hideHelp: true,
     async handler($bot, trigger) {
       $bot.clearScreen()
     },
@@ -208,6 +362,10 @@ export const handlers: BotHandler<BotEnvs>[] = [
   {
     keyword: 'kitchensink',
     async handler($bot, trigger) {
+      const roomGuard = $bot.groupRoomGuard(trigger)
+      if (roomGuard.violation === true) {
+        return $bot.dm(trigger.personId, roomGuard.card as SpeedyCard)
+      }
       // Clearscreen (only works desktop)
       await $bot.clearScreen()
       await $bot.send(`## Kitchen Sink`)
@@ -286,6 +444,13 @@ export const handlers: BotHandler<BotEnvs>[] = [
         })
       )
 
+      $bot.send(
+        $bot.stashCard(
+          `My super secret: *${$bot.rando()}*`,
+          'Here is a special message'
+        )
+      )
+
       // Randomiation/response variation
       const utterances = [
         `Heya how's it going $[name]?`,
@@ -304,28 +469,16 @@ export const handlers: BotHandler<BotEnvs>[] = [
 
       $bot.sendJSON({ a: 1, b: 2, c: 3 }, 'Here is some snippet data')
       await $bot.sendRandom(['option a', 'option b', 'option c'])
-      const b = $bot.skyCard({ title: 'Speedybot' })
-      const r = $bot.dangerCard({ title: 'Speedybot' })
-      const g = $bot.successCard({ title: 'Speedybot' })
-      const y = $bot.warningCard({ title: 'Speedybot' })
+      const b = $bot.skyCard({ title: 'Speedybot-Hub' })
+      const r = $bot.dangerCard({ title: 'Speedybot-Hub' })
+      const g = $bot.successCard({ title: 'Speedybot-Hub' })
+      const y = $bot.warningCard({ title: 'Speedybot-Hub' })
       $bot.send(b)
       $bot.send(r)
       $bot.send(g)
       $bot.send(y)
     },
     helpText: 'A buncha stuff all at once',
-  },
-  {
-    keyword: ['ping', 'pong'],
-    async handler($bot, trigger) {
-      const normalized = trigger.text.toLowerCase()
-      if (normalized === 'ping') {
-        $bot.say('pong')
-      } else {
-        $bot.say('ping')
-      }
-    },
-    helpText: `A handler that says ping when the user says pong and vice versa`,
   },
   {
     // keyword: ['file','files','sendfile'],
@@ -369,51 +522,14 @@ ${JSON.stringify(trigger, null, 2)}
       )
     },
   },
-  {
-    keyword: '<@nomatch>',
-    async handler($bot, trigger: any) {
-      const utterances = [
-        `Sorry, I don't know what '$[text]' means`,
-        `Whoops, this agent doesn't support '$[text]'`,
-        `'$[text]' is not a supported command`,
-      ]
-      const template = {
-        text: trigger.message.text,
-      }
-
-      $bot.sendTemplate(utterances, template)
-    },
-  },
-  {
-    keyword: '<@fileupload>',
-    async handler($bot: any, trigger: any) {
-      $bot.say('You uploaded a file')
-      const [fileUrl] = trigger.message.files || []
-      const fileData = await $bot.getFile(fileUrl, {
-        responseType: 'arraybuffer',
-      })
-      const { fileName, extension, type } = fileData
-      $bot.say(
-        `The file you uploaded (${fileName}), is a ${extension} file of type ${type}`
-      )
-    },
-    hideHelp: true,
-  },
-  {
-    keyword: '<@submit>',
-    handler($bot, trigger: any) {
-      $bot.say(
-        `Submission received! You sent us ${JSON.stringify(
-          trigger.attachmentAction.inputs
-        )}`
-      )
-    },
-  },
 ]
 
-import { BotHandler } from '../src/lib/payloads.types'
+// Imports
+import { SpeedyCard } from '../src/docs'
+import { BotHandler, FILE_TRIGGER } from '../src/lib/payloads.types'
 
 // For nice typing, add secrets availble on $bot.env
 export type BotEnvs = {
   BOT_TOKEN: string
+  VISION_TOKEN: string
 }

@@ -36,7 +36,7 @@ Alternatively, go ahead and **[🍴Fork this repo🍴](https://github.com/valgaz
 
 Think of a "hubs" as a central spots around which all your conversation design infrastructure + integrations + webhooks + all the rest can gather. You shouldn't have to think about anything but what matters in a conversation-- (1) the content + (2) useful/labor-savings rich integrations (files, location, sensors, etc)
 
-Speedybot-hub takes care of virtually all of the "everything else" so all you and your team need to think about is about a single file, handlers.ts: **[settings/handlers.ts](https://github.com/valgaze/speedybot-hub/blob/deploy/settings/handlers.ts)** (And if you need further customization like supporting multiple languages, **[prompting users for permissions](https://github.com/valgaze/speedybot-hub/blob/deploy/docs/assets/demo_location.gif), **[validating webhook secrets](https://developer.webex.com/blog/building-a-more-secure-bot)**, etc see **[settings/config.ts](https://github.com/valgaze/speedybot-hub/blob/deploy/settings/config.ts)\*\* )
+Speedybot-hub takes care of virtually all of the "everything else" so all you and your team need to think about is about a single file, handlers.ts: [settings/handlers.ts](https://github.com/valgaze/speedybot-hub/blob/deploy/settings/handlers.ts) And if you need further customization like supporting multiple languages, [prompting users for permissions](https://github.com/valgaze/speedybot-hub/blob/deploy/docs/assets/demo_location.gif), [validating webhook secrets](https://developer.webex.com/blog/building-a-more-secure-bot), etc see [settings/config.ts](https://github.com/valgaze/speedybot-hub/blob/deploy/settings/config.ts)
 
 ### Special "magic" keywords
 
@@ -46,6 +46,7 @@ Some things can't/shoudn't live inisde an NLU, these magic keywords allow you to
 
 - <@catchall> (runs on every received message, useful when "passing" chat messages an NLU service and getting a response)
 - <@submit> (capture the result of an **[AdaptiveCard](https://developer.webex.com/docs/api/guides/cards)** form submission)
+- <@camera> (runs whenever an image is uploaded (png, jpeg or anything specified on config.features.camera.validExtensions))
 - <@fileupload> (triggers when files uploaded-- `$bot.getFile` name and lots of other data
 - <@nomatch> (runs when no handler, aside from <@catchall>, matches the input)
 
@@ -148,3 +149,11 @@ export const handlers = [
   },
 ]
 ```
+
+## Image detector
+
+If you sign-up & setup credentials to Google vision (instructions here: **https://cloud.google.com/vision/docs/setup**) you can get easy image annotation with the built-in image-detector.
+
+A one-hour token is available with the cli under `gcloud auth print-access-token`-- once you have a token, add it as a secret with `npx wrangler secret put VISION_TOKEN`
+
+**[$bot.imageDetector docs](https://github.com/valgaze/speedybot-hub/blob/deploy/api-docs/classes/BotRoot.md#imagedetector)**

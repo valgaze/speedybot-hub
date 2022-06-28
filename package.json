@@ -17,7 +17,8 @@
     "typedoc-theme-category": "^1.0.7",
     "typedoc-theme-hierarchy": "^1.2.1",
     "typescript": "^4.7.2",
-    "wrangler": "2.0.6"
+    "wrangler": "2.0.6",
+    "typedoc-plugin-markdown": "^3.12.1"
   },
   "private": true,
   "scripts": {
@@ -34,7 +35,5 @@
     "build:lib": "tsc --project tsconfig_lib.json",
     "append": "echo \"\n\" >> wrangler.toml && echo [vars] >> wrangler.toml && echo TOKEN = \"$1\" >> wrangler.toml"
   },
-  "dependencies": {
-    "typedoc-plugin-markdown": "^3.12.1"
-  }
+  "dependencies": {}
 }

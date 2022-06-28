@@ -1,5 +1,12 @@
 import { InitBot, BotConfig } from './bot'
-import { checkers, placeholder, typeIdentifier } from './common'
+import {
+  checkers,
+  placeholder,
+  typeIdentifier,
+  makeRequest,
+  peekFile,
+  actions,
+} from './common'
 
 import { LocationAwareBot } from './location'
 // Types
@@ -61,8 +68,11 @@ export type SpeedyConfig = {
   debug?: boolean
   fallbackText?: string
   features?: {
-    chips: {
+    chips?: {
       disappearOnTop: boolean
+    }
+    camera?: {
+      validExtensions: string[]
     }
   }
   location?($bot: LocationAwareBot): Promise<any> | void
@@ -105,6 +115,7 @@ export class SpeedybotHub<T = any> {
   }
 
   constants = {
+    camera: '<@camera>',
     catchall: '<@catchall>',
     submit: '<@submit>',
     file: '<@fileupload>',
@@ -137,6 +148,16 @@ If you need a token, see here: https://developer.webex.com/my-apps/new/bot`,
     }
   }
 
+  /**
+   * Cheap way to get content-dispoition header & content-type and get extension
+   * @param url
+   * @returns
+   */
+  public async peekFile(
+    url: string
+  ): Promise<{ fileName: string; type: string; extension: string }> {
+    return peekFile(this.config.token, url)
+  }
   async processIncoming(envelope: ENVELOPES, request: Request) {
     // TODO: break into more coherent smaller pieces w/o using lotta memory+space
     this.debug('##', envelope)
@@ -217,7 +238,26 @@ If you need a token, see here: https://developer.webex.com/my-apps/new/bot`,
       }
 
       if (reqType === 'FILE') {
-        targets.push(this.constants.file)
+        // Do a peek operation here
+        // Since someboy'll need some weird format, extensible in root config.features.camera.validExtensions
+        if ('files' in envelope.data) {
+          const { files } = envelope.data
+          const [url] = files as string[]
+          // Do a peek
+          const formats = this.config.features?.camera?.validExtensions || []
+          const photos = formats.length
+            ? ['png', 'jpg', 'jpeg', ...formats]
+            : ['png', 'jpg', 'jpeg']
+
+          const res = await this.peekFile(url)
+          const { extension } = res
+          if (photos.includes(extension)) {
+            // There's a file and it's a photo
+            targets.push(this.constants.camera)
+          } else {
+            targets.push(this.constants.file)
+          }
+        }
       }
 
       if (reqType === 'TEXT') {
@@ -282,7 +322,10 @@ If you need a token, see here: https://developer.webex.com/my-apps/new/bot`,
       )
       .map(({ keyword, helpText = '' }) => {
         let candidate = Array.isArray(keyword) ? keyword[0] : keyword
-        return { label: candidate as string, helpText }
+        return {
+          label: typeof candidate === 'string' ? candidate : '{regex}',
+          helpText,
+        }
       })
     return res
   }
@@ -429,46 +472,6 @@ If you need a token, see here: https://developer.webex.com/my-apps/new/bot`,
     return handlerStash
   }
 
-  async _send(payload: ToMessage): Promise<MessageDetails> {
-    const makeRequest = async (
-      url: string,
-      body: any,
-      opts: RequestOps = {}
-    ) => {
-      const defaultConfig = {
-        method: 'POST',
-        'content-type': 'application/json;charset=UTF-8',
-        raw: false,
-      }
-      const contentType = opts['content-type']
-        ? opts['content-type']
-        : defaultConfig['content-type']
-      const additionalHeaders = opts.headers ? opts.headers : {}
-      const init: {
-        method: string
-        headers: any
-        body?: any
-        [key: string]: any
-      } = {
-        method: opts.method ? opts.method : defaultConfig.method,
-        headers: {
-          'content-type': contentType,
-          Authorization: `Bearer ${this.globals?.config?.token}`,
-          ...additionalHeaders,
-        },
-      }
-      if (opts.method === 'POST') {
-        init.body = opts.raw ? body : JSON.stringify(body)
-      }
-      const response = await fetch(url, init)
-      return response
-    }
-
-    const res = await makeRequest(this.API.sendMessage, payload)
-    const json = await res.json()
-    return json as MessageDetails
-  }
-
   async send<T = any>(payload: string | ToMessage | Card): Promise<T> {
     // will take a sting, Speedycard, or object & send it
     // will use global roomId by default unless specified in payload
@@ -507,40 +510,6 @@ If you need a token, see here: https://developer.webex.com/my-apps/new/bot`,
           ...payload,
         }
       }
-    }
-
-    const makeRequest = async (
-      url: string,
-      body: any,
-      opts: RequestOps = {}
-    ) => {
-      const defaultConfig = {
-        method: 'POST',
-        'content-type': 'application/json;charset=UTF-8',
-        raw: false,
-      }
-      const contentType = opts['content-type']
-        ? opts['content-type']
-        : defaultConfig['content-type']
-      const additionalHeaders = opts.headers ? opts.headers : {}
-      const init: {
-        method: string
-        headers: any
-        body?: any
-        [key: string]: any
-      } = {
-        method: opts.method ? opts.method : defaultConfig.method,
-        headers: {
-          'content-type': contentType,
-          Authorization: `Bearer ${opts.token}`,
-          ...additionalHeaders,
-        },
-      }
-      if (opts.method === 'POST') {
-        init.body = opts.raw ? body : JSON.stringify(body)
-      }
-      const response = await fetch(url, init)
-      return response
     }
 
     const res = (await makeRequest(this.API.sendMessage, body, {
@@ -657,7 +626,7 @@ If you need a token, see here: https://developer.webex.com/my-apps/new/bot`,
   public async actionHandler(details: AA_Details) {
     const root = details.inputs
     const { action = '' } = root
-    if (action === 'location_abort') {
+    if (action === actions.location_abort) {
       // 1) delete reply
       const { messageId } = details
       await this.deleteMessage(messageId)
@@ -666,9 +635,13 @@ If you need a token, see here: https://developer.webex.com/my-apps/new/bot`,
       const { messageId: cardId } = details.inputs
       await this.deleteMessage(cardId)
     }
-
-    if (action === 'delete_message') {
+    if (action === actions.delete_message) {
       const { messageId } = details.inputs
+      await this.deleteMessage(messageId)
+    }
+
+    if (action === actions.delete_stash_card) {
+      const { messageId } = details
       await this.deleteMessage(messageId)
     }
 

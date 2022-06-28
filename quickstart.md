@@ -68,6 +68,12 @@ npm run deploy
 
 ![image](./docs/assets/first_spin.gif)
 
+## 6a Image detector
+
+If you sign-up & setup credentials to Google vision (instructions here: **https://cloud.google.com/vision/docs/setup**) you can get easy image annotation with the built-in image-detector
+
+**[$bot.imageDetector docs](https://github.com/valgaze/speedybot-hub/blob/deploy/api-docs/classes/BotRoot.md#imagedetector)**
+
 ## Zero Effort
 
 If you don't want to muck around with the terminal, you have 2 other options

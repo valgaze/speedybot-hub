@@ -60,7 +60,7 @@
 
 #### Defined in
 
-[lib/cards.ts:3](https://github.com/valgaze/speedybot-hub/blob/c3263c6/src/lib/cards.ts#L3)
+[lib/cards.ts:3](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/cards.ts#L3)
 
 ___
 
@@ -88,7 +88,7 @@ ___
 
 #### Defined in
 
-[lib/bot.ts:21](https://github.com/valgaze/speedybot-hub/blob/c3263c6/src/lib/bot.ts#L21)
+[lib/bot.ts:25](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/bot.ts#L25)
 
 ___
 
@@ -137,8 +137,10 @@ async validate(request: Request) {
 | :------ | :------ |
 | `debug?` | `boolean` |
 | `fallbackText?` | `string` |
-| `features?` | { `chips`: { `disappearOnTop`: `boolean`  }  } |
-| `features.chips` | { `disappearOnTop`: `boolean`  } |
+| `features?` | { `camera?`: { `validExtensions`: `string`[]  } ; `chips?`: { `disappearOnTop`: `boolean`  }  } |
+| `features.camera?` | { `validExtensions`: `string`[]  } |
+| `features.camera.validExtensions` | `string`[] |
+| `features.chips?` | { `disappearOnTop`: `boolean`  } |
 | `features.chips.disappearOnTop` | `boolean` |
 | `locales?` | { `[localeName: string]`: { `[key: string]`: `any`;  };  } |
 | `token` | `string` |
@@ -147,7 +149,7 @@ async validate(request: Request) {
 
 #### Defined in
 
-[lib/speedybot_hub.ts:59](https://github.com/valgaze/speedybot-hub/blob/c3263c6/src/lib/speedybot_hub.ts#L59)
+[lib/speedybot_hub.ts:66](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/speedybot_hub.ts#L66)
 
 ## Functions
 
@@ -174,7 +176,7 @@ async validate(request: Request) {
 
 #### Defined in
 
-[lib/bot.ts:1192](https://github.com/valgaze/speedybot-hub/blob/c3263c6/src/lib/bot.ts#L1192)
+[lib/bot.ts:1517](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/bot.ts#L1517)
 
 ___
 
@@ -238,4 +240,4 @@ export default {
 
 #### Defined in
 
-[lib/bot.ts:1235](https://github.com/valgaze/speedybot-hub/blob/c3263c6/src/lib/bot.ts#L1235)
+[lib/bot.ts:1560](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/bot.ts#L1560)

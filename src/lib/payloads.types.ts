@@ -2,8 +2,11 @@ import { SpeedyCard } from './cards'
 
 import { BotRoot } from './bot'
 export type BotHandler<K = any, T = MESSAGE_TRIGGER> = {
-  keyword: string | string[] | (string | RegExp)[]
-  handler(bot: BotRoot<K>, trigger: T): Promise<void> | void
+  keyword: RegExp | string | string[] | (string | RegExp)[]
+  handler(
+    bot: BotRoot<K>,
+    trigger: T
+  ): Promise<void | Response | undefined> | void
   helpText?: string
   hideHelp?: boolean
 }

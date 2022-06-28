@@ -11,6 +11,12 @@ export const API = {
   deleteMessage: 'https://webexapis.com/v1/messages',
 }
 
+export const actions = {
+  location_abort: 'location_abort',
+  delete_message: 'delete_message',
+  delete_stash_card: 'delete_stash_card',
+}
+
 import { SpeedyCard } from './cards'
 export const placeholder = '__REPLACE__ME__'
 import { ENVELOPES, RequestTypes } from './payloads.types'
@@ -117,6 +123,35 @@ export const makeRequest = async (
   return response
 }
 
+/**
+ * Cheap way to get content-dispoition header & content-type and get extension
+ * @param url
+ * @returns
+ */
+export const peekFile = async (
+  token: string,
+  url: string
+): Promise<{ fileName: string; type: string; extension: string }> => {
+  // file URL is the endpoint
+  const res = await makeRequest(
+    url,
+    {},
+    {
+      method: 'HEAD',
+      token: token,
+    }
+  )
+  const type = res.headers.get('content-type') as string
+  const contentDispo = res.headers.get('content-disposition') as string
+  const fileName = contentDispo.split(';')[1].split('=')[1].replace(/\"/g, '')
+  const extension = fileName.split('.').pop() || ''
+
+  return {
+    fileName,
+    type,
+    extension,
+  }
+}
 export const pickRandom = (list: any[] = []) => {
   return list[Math.floor(Math.random() * list.length)]
 }

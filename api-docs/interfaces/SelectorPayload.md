@@ -38,7 +38,7 @@ bot.sendCard(cardPayload.render(), 'Your client doesnt appear to support adaptiv
 
 #### Defined in
 
-[lib/cards.ts:111](https://github.com/valgaze/speedybot-hub/blob/c3263c6/src/lib/cards.ts#L111)
+[lib/cards.ts:111](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/cards.ts#L111)
 
 ___
 
@@ -48,7 +48,7 @@ ___
 
 #### Defined in
 
-[lib/cards.ts:113](https://github.com/valgaze/speedybot-hub/blob/c3263c6/src/lib/cards.ts#L113)
+[lib/cards.ts:113](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/cards.ts#L113)
 
 ___
 
@@ -58,4 +58,4 @@ ___
 
 #### Defined in
 
-[lib/cards.ts:112](https://github.com/valgaze/speedybot-hub/blob/c3263c6/src/lib/cards.ts#L112)
+[lib/cards.ts:112](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/cards.ts#L112)

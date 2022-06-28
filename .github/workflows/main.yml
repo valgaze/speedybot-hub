@@ -33,4 +33,4 @@ jobs:
             BOT_TOKEN
       - name: Register Webhooks (requires both HOST + BOT_TOKEN secrets)
         if: "${{ env.BOT_TOKEN != '' && env.HOST != '' }}"
-        run: npm init speedybot webhook create -- -w ${HOST} -t ${BOT_TOKEN}
+        run: npm init -y speedybot webhook create -- -w ${HOST} -t ${BOT_TOKEN}

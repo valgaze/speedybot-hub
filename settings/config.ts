@@ -1,5 +1,4 @@
-import { SpeedyConfig, LocationAwareBot } from '../src/lib/'
-
+// Root config-- locales, validation, location handler, etc
 export const config: SpeedyConfig = {
   token: 'placeholder', // 🚨 Given our infra, this will be replaced with BOT_TOKEN secret using with wrangler cli/github secrets
   locales: {
@@ -30,8 +29,7 @@ export const config: SpeedyConfig = {
     return { proceed: true }
   },
   async location($bot: LocationAwareBot) {
-    // Only here you have $bot.location
-    $bot.send(
+    await $bot.send(
       $bot
         .card({
           title: `Good ${$bot.location.tod}`,
@@ -48,8 +46,17 @@ export const config: SpeedyConfig = {
           'See map 🗺'
         )
     )
+
+    await $bot.send(
+      $bot.card({
+        title: 'Restart?',
+        chips: [{ keyword: 'announce_dm', label: '🔄 Restart' }],
+      })
+    )
   },
   debug: true,
   fallbackText:
     'Sorry, it does not appear your client supports rendering cards',
 }
+
+import { SpeedyConfig, LocationAwareBot } from '../src/lib/'

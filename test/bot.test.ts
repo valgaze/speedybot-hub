@@ -178,14 +178,14 @@ test('card generates a card', () => {
     actions: [
       { type: 'Action.Submit', title: 'no', data: { chip_action: 'no' } },
       { type: 'Action.Submit', title: 'Sure', data: { chip_action: 'yes' } },
-      { type: 'Action.Submit', title: 'Submit', data: {} },
+      { type: 'Action.Submit', title: 'Submit' },
     ],
   }
 
   expect(actual).toEqual(expected)
 })
 
-test('', () => {
+test('sanity-mock', () => {
   const mockMakeRequest = async (url: string, body: any, opts?: RequestOps) => {
     const expected = {}
     const actual = {}

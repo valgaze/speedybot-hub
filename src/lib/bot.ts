@@ -1,4 +1,7 @@
 import { SpeedyCard } from './cards'
+import { BLUE, GREEN, RED, YELLOW } from './colors'
+import { AbbreviatedSpeedyCard } from './cards'
+
 import {
   makeRequest as CoreMakerequest,
   checkers,
@@ -12,9 +15,11 @@ import {
   SelfData,
   MessageData,
   MESSAGE_TRIGGER,
+  MessageReply,
   FILE_TRIGGER,
 } from './payloads.types'
-export type BotConfig = {
+export type BotConfig<T = any> = {
+  env?: T
   roomId: string
   fallbackText?: string
   token: string
@@ -26,22 +31,18 @@ export type BotConfig = {
   helpContent?: { helpText: string; label: string }[]
   url?: string
 }
-export interface AttachmentData {
-  [key: string]: any
-}
-export type AbbreviatedSpeedyCard = {
-  title: string
-  subTitle: string
-  image: string
-  url: string
-  urlLabel: string
-  data: AttachmentData
-  chips: (string | { label: string; keyword?: string })[]
-  table: string[][] | { [key: string]: string }
-  choices: (string | number)[]
-}
 
-export class BotRoot {
+/**
+ * Root bot object used in handlers-- enshrined with many convenience helpers & lessons learned the hard way
+ *
+ *
+ *![cards](media://first_spin.gif)
+ *
+ *
+ */
+export class BotRoot<T = { BOT_TOKEN: string }> {
+  // Environment variables available to Speedybot-hub
+  public env: T = {} as T
   private helpContent: { helpText: string; label: string }[] = []
   private roomId = ''
   private fallbackText =
@@ -51,6 +52,9 @@ export class BotRoot {
     url: '',
   }
 
+  /**
+   *  Locales holder, passed in by Speedybot but hacky escape hatch available too
+   */
   public locales = {}
   private API = API
 
@@ -60,6 +64,11 @@ export class BotRoot {
   ) {
     this.roomId = config.roomId
     this.token = config.token
+    if (config.env) {
+      this.env = config.env
+    } else {
+      this.env = {} as T
+    }
 
     if (config.locales) {
       this.locales = config.locales
@@ -102,7 +111,7 @@ export class BotRoot {
   /**
    * Fill in a template (usually used by sendTemplate)
    * ```ts
-   *   const utterances = ['Howdy $[name], here's $[flavor]', '$[name], here's your $[flavor] ice cream']
+   *   const utterances = ['Howdy $[name], here's $[flavor]', '$[name], here\'s your $[flavor] ice cream']
    *   const template = { name: 'Joe', flavor: 'strawberry' }
    *   const response = $bot.fillTemplate(utterances, template) // "Joe, here's your strawberry ice cream"
    *
@@ -123,29 +132,65 @@ export class BotRoot {
    *
    * ```
    */
+
+  /**
+   *
+   * Send a url wrapped in a card
+   *
+   *
+   * ```ts
+   * {
+   *  keyword: 'bingo',
+   *  async handler($bot, trigger) {
+   *   const utterances = [
+   *     'Howdy $[name], here is a $[flavor]',
+   *     '$[name], one $[flavor] ice cream for you',
+   *   ]
+   *   const template = { name: 'Joe', flavor: 'strawberry' }
+   *   $bot.sendTemplate(utterances, template)
+   *
+   *  }
+   * }
+   *
+   * ```
+   */
   public sendTemplate(utterances: string[], template: any = {}) {
     const res = this.fillTemplate(utterances, template)
     return this.send(res)
   }
 
   /**
-   * Send a url wrapped in a card
-   * If analytics are enabled, will append url
-   * @param url
    *
+   * Send a url wrapped in a card
+   *
+   *
+   * ```ts
+   * {
+   *  keyword: 'bingo',
+   *  async handler($bot, trigger) {
+   *   const url = 'https://codepen.io/valgaze/pen/PoEpxpb'
+   *   $bot.sendURL(url, 'Check this out', '💫 See Resource')
+   *  }
+   * }
+   *
+   * ```
    */
-  public async sendURL(url: string, title?: string, buttonTitle = 'Go') {
+  public async sendURL(
+    url: string,
+    title?: string,
+    buttonTitle = 'Go'
+  ): Promise<MessageReply> {
     const card = new SpeedyCard()
     if (title) {
       card.setTitle(title).setUrl(url, buttonTitle)
     } else {
       card.setSubtitle(url).setUrl(url, buttonTitle)
     }
-    this.send(card)
+    return this.send(card)
   }
 
   /**
-   * Reach an api that returns JSON (get)
+   * Reach an api that returns JSON-- alias to fetch
    *
    * ```ts
    * {
@@ -157,8 +202,6 @@ export class BotRoot {
    *  }
    * }
    * ```
-   *
-   *
    */
   public async api<T = any>(
     request: string | Request,
@@ -177,6 +220,7 @@ export class BotRoot {
    *
    * Send a 1-1/DM message to a user based on their email or personId
    *
+   * You can send a string or a card
    *
    * ```ts
    * {
@@ -251,15 +295,22 @@ export class BotRoot {
    *
    *  // Send a card: https://developer.webex.com/docs/api/guides/cards
    *  $bot.send($bot.card({title:'My special card', subTitle:'My great subtitle', chips:['ping','pong','hi']}))
+   *
+   *  // Send a traditional ToMessage
+   *  const payload = {
+   *    toPersonEmail: 'fake_name@org.com',
+   *    markdown: 'some **great** content',
+   *  }
+   *  $bot.send(payload)
    *  }
    * }
    * ```
    *
    */
-  async send<T = any>(payload: string | ToMessage | Card): Promise<T> {
+  async send<T = MessageReply>(payload: string | ToMessage | Card): Promise<T> {
     let body: ToMessage = {}
 
-    if (typeof payload !== 'string') {
+    if (payload && typeof payload !== 'string') {
       if ('toPersonId' in payload) {
         body['toPersonId'] = payload.toPersonId
       }
@@ -273,6 +324,7 @@ export class BotRoot {
       }
 
       if (
+        payload &&
         !('roomId' in payload) &&
         !('toPersonEmail' in payload) &&
         !('toPersonId' in payload)
@@ -323,6 +375,8 @@ export class BotRoot {
    *
    * Convenience helper that creates a SpeedyCard
    *
+   * ![cards](media://demo_sendcard.gif)
+   *
    *
    * ```ts
    * {
@@ -342,7 +396,9 @@ export class BotRoot {
    *
    * ```
    */
-  card(config: Partial<AbbreviatedSpeedyCard> = {}): SpeedyCard {
+  card(
+    config: Partial<AbbreviatedSpeedyCard & { label: string }> = {}
+  ): SpeedyCard {
     const card = new SpeedyCard()
     const {
       title = '',
@@ -354,8 +410,12 @@ export class BotRoot {
       chips = [],
       table = [],
       choices = [],
+      backgroundImage = '',
     } = config
 
+    if (backgroundImage) {
+      card.setBackgroundImage
+    }
     if (title) {
       card.setTitle(title)
     }
@@ -431,6 +491,22 @@ export class BotRoot {
     return json
   }
 
+  /**
+   *
+   * Delete a message (need a valid messageId)
+   *
+   *
+   * ```ts
+   * {
+   *  keyword: 'bingo',
+   *  async handler($bot, trigger) {
+   *   const msg = await $bot.send('My message to be deleted')
+   *   $bot.deleteMessage(msg.id)
+   *  }
+   * }
+   *
+   * ```
+   */
   public async deleteMessage(messageId: string) {
     const url = `${this.API.deleteMessage}/${messageId}`
     const res = await this.makeRequest(
@@ -448,6 +524,9 @@ export class BotRoot {
    * Location Authorizer
    * Ask the user for access to their location, if they provide permission run location authorizer
    *
+   * You can use their timezone to determine greetings (morning/afternoon/evening) and other
+   * surrounding "context" about the user
+   *
    * NOTE: This location data is deliberately imprecise-- the best you can expect is to know if
    * it is light/dark outside the user's location, timezone, country, etc
    *
@@ -460,6 +539,10 @@ export class BotRoot {
    *    $bot.locationAuthorizer(trigger)
    *  }
    * }
+   * ```
+   *
+   * ![cards](media://demo_location.gif)
+   *
    */
   public async locationAuthorizer(
     trigger: MESSAGE_TRIGGER | FILE_TRIGGER,
@@ -470,17 +553,13 @@ export class BotRoot {
 
     // Sneak'ily using reply message as the "state", if doesn't exist don't allow
     const rootMessage: ToMessage = {
-      text: `'${displayName}' is requesting access to limited location data (country, timezone, city, ) in order to perform that action`,
+      text: `'${displayName}' is requesting access to limited location data (country, timezone, city) in order to perform that action`,
     }
-
-    // if ('message' in trigger && 'id' in trigger.message) {
-    //   rootMessage['parentId'] = trigger.message.id
-    // }
 
     const { id } = await this.send(rootMessage)
     const url = `${this.meta.url}location?roomId=${trigger.message.roomId}&messageId=${id}`
     this.send(
-      this.card({
+      this.warningCard({
         title: message
           ? message
           : `'${displayName}' wants to use your location, allow?`,
@@ -549,8 +628,14 @@ export class BotRoot {
   }
 
   private generateFileName() {
-    const rando = () => `${Math.random().toString(36).slice(2)}`
-    return `${rando()}_${rando()}`
+    return `${this.rando()}_${this.rando()}`
+  }
+
+  /**
+   * Generate a random string of 11 characters (letters + numbers)
+   */
+  public rando(): string {
+    return Math.random().toString(36).slice(2)
   }
 
   private handleExtension(input = '') {
@@ -575,22 +660,22 @@ export class BotRoot {
   /**
    *
    *
-   * Create a file and fill it with the data you provide
+   * Generate a file and fill it with the data you provide and send to user to download
    *
    * At minimum, provide the file data & desired file extension
    *
-   * `` `ts
+   * ```ts
    * {
    *  keyword: 'bingo',
    *  async handler($bot) {
-   *    const myData = { a: 1, b: 2, c: [1,2,3,'hello', 'bonjour]}
+   *    const myData = { a: 1, b: 2, c: [1,2,3,'hello', 'bonjour']}
    *    $bot.sendDataAsFile(myData, 'json')
    *  }
    * }
    *
    * ```
    */
-  async sendDataAsFile(
+  public async sendDataAsFile(
     data: any,
     extensionOrFileName: string,
     contentType = null,
@@ -769,15 +854,22 @@ export class BotRoot {
    *  }
    * }
    *
+   * const config = {
+   *  token: 'abc',
+   *  locales
+   * }
+   * const handlers = []
+   * const hub = new SpeedybotHub(config, handlers, env)
    *
-   *
+   * // in handlers list
    * {
    *  keyword: 'bingo',
    *  handler($bot) {
    *    const eng = $bot.translate('en', 'greetings.welcome')
    *    const esp = $bot.translate('es', 'greetings.welcome')
    *    const chn = $bot.translate('cn', 'greetings.welcome')
-   *    $bot.send(`${eng}, ${esp}, ${chn}`k)
+   *    const fallback = $bot.translate('whoops_doesnt_exist', 'greetings.welcome', 'Hey there fallback!')
+   *    $bot.send(`${eng}, ${esp}, ${chn}, ${fallback}`)
    *  }
    * }
    *
@@ -806,6 +898,15 @@ export class BotRoot {
    * Filetypes: 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'pdf', 'jpg', 'jpeg', 'bmp', 'gif', 'png'
    * See more info here: https://developer.webex.com/docs/basics
    *
+   * ```ts
+   * {
+   *  keyword: 'bingo',
+   *  handler($bot) {
+   *    const pdfURL = 'https://speedybot.valgaze.com'
+   *    $bot.sendDataFromUrl(pdfURL, "Here's a doc!")
+   *  }
+   * }
+   * ```
    */
   public sendDataFromUrl(url: string, fallbackText = ' ') {
     return this.send({
@@ -814,10 +915,28 @@ export class BotRoot {
     })
   }
 
+  /**
+   * Logs to system
+   *
+   * ```ts
+   * {
+   *  keyword: 'bingo',
+   *  handler($bot) {
+   *    $bot.log('Testing 123')
+   *  }
+   * }
+   * ```
+   */
   public log(...payload: any): void {
     console.log.apply(console, payload as [any?, ...any[]])
   }
 
+  /**
+   * Takes input data and wraps in markdown backticks
+   * @param data
+   * @param dataType
+   * @returns
+   */
   public snippet(data: any, dataType = 'json') {
     const msg = `
 \`\`\`${dataType}
@@ -850,7 +969,7 @@ ${dataType === 'json' ? JSON.stringify(data, null, 2) : data}
   }
 
   /**
-   * Display a snippet of nicely-formatted
+   * Display a snippet of nicely-formatted (alias for $bot.sendSnippet)
    * JSON data or code-snippet to the user
    *
    * ```ts
@@ -880,8 +999,6 @@ ${dataType === 'json' ? JSON.stringify(data, null, 2) : data}
    *  }
    * }
    * ```
-   *
-   *
    */
   async sendSnippet(
     data: string | object,
@@ -906,19 +1023,6 @@ ${dataType === 'json' ? JSON.stringify(data, null, 2) : data}
   }
 
   /**
-   *
-   * Will return a URL which can be intercepted
-   * and "tracked"
-   *
-   *
-   */
-  public makeLink(url: string): string {
-    return `${this.meta.url}/${url}`
-  }
-
-  public buildHelp() {}
-
-  /**
    * Traverse a property lookup path on a object
    * fallback to a value (if provided) whenever
    * path is invalid
@@ -933,7 +1037,7 @@ ${dataType === 'json' ? JSON.stringify(data, null, 2) : data}
    *    const fail = $bot.lookUp(myData, 'a.b.ce.e.f.g', 'fallback') // 'fallback'
    *  }
    * }
-   *
+   *```
    *
    */
   public lookUp(locale: any, lookup = '', fallback?: string) {
@@ -948,6 +1052,117 @@ ${dataType === 'json' ? JSON.stringify(data, null, 2) : data}
     return res ? res : fallback
   }
 
+  // Color cards-- can be served from URL or base64 encoded
+
+  /**
+   * Returns an instance of a dangerCard. dangerCards have blue skylike background:
+   *
+   *
+   * ![cards](media://colored_cards.gif)
+   *
+   * ```ts
+   * {
+   *  keyword: 'bingo',
+   *  async handler($bot) {
+   *    const danger = $bot.dangerCard({
+   *     title: '⛔️DANGER-- do not do that!⛔️',
+   *     subTitle: 'There is a very important reason not to do that',
+   *     chips: ['ping', 'pong'],
+   *    })
+   *  $bot.send(danger)
+   *  }
+   * }
+   *```
+   *
+   * @param payload (title, subtitle, etc)
+   * @returns SpeedyCard
+   */
+  public dangerCard(payload: Partial<AbbreviatedSpeedyCard>) {
+    return this.card(payload).setBackgroundImage(`data:image/png;base64,${RED}`)
+  }
+
+  /**
+   * Returns an instance of a SuccessCard. SuccessCards have blue skylike background:
+   *
+   *
+   * ![cards](media://colored_cards.gif)
+   *
+   * ```ts
+   * {
+   *  keyword: 'bingo',
+   *  async handler($bot) {
+   *    const warning = $bot.successCard({
+   *     title: '⚠️Warning-- you should consider carefully if you want to do that!⚠️',
+   *     subTitle: 'There is a very important reason to slow down and consider if you want to do that...or not',
+   *     chips: ['ping', 'pong'],
+   *    })
+   *  $bot.send(warning)
+   *  }
+   * }
+   *```
+   *
+   * @param payload (title, subtitle, etc)
+   * @returns SpeedyCard
+   */
+  public warningCard(payload: Partial<AbbreviatedSpeedyCard>) {
+    return this.card(payload).setBackgroundImage(
+      `data:image/png;base64,${YELLOW}`
+    )
+  }
+
+  /**
+   * Returns an instance of a SuccessCard. SuccessCards have blue skylike background:
+   *
+   *
+   * ![cards](media://colored_cards.gif)
+   *
+   * ```ts
+   * {
+   *  keyword: 'bingo',
+   *  async handler($bot) {
+   *    const success = $bot.successCard({
+   *     title: '🌟You did it!🎉',
+   *     subTitle: 'Whatever you did, good at job at doing it',
+   *     chips: ['ping', 'pong'],
+   *    })
+   *  $bot.send(success)
+   *  }
+   * }
+   *```
+   *
+   * @param payload (title, subtitle, etc)
+   * @returns SpeedyCard
+   */
+  public successCard(payload: Partial<AbbreviatedSpeedyCard>) {
+    return this.card(payload).setBackgroundImage(
+      `data:image/png;base64,${GREEN}`
+    )
+  }
+
+  /**
+   * Returns an instance of a skyCard. SkyCards have blue skylike background:
+   *
+   *
+   * ![cards](media://colored_cards.gif)
+   *
+   * ```ts
+   * {
+   *  keyword: 'bingo',
+   *  async handler($bot) {
+   *    const card = $bot.skyCard({title: '☁️ What a pleasant card ☁️'})
+   *    $bot.send(card)
+   *  }
+   * }
+   *```
+   *
+   * @param payload (title, subtitle, etc)
+   * @returns SpeedyCard
+   */
+  public skyCard(payload: Partial<AbbreviatedSpeedyCard>) {
+    return this.card(payload).setBackgroundImage(
+      `data:image/gif;base64,${BLUE}`
+    )
+  }
   //Aliases
   /**
    * Legacy alias for $bot.send
@@ -974,11 +1189,11 @@ ${dataType === 'json' ? JSON.stringify(data, null, 2) : data}
   }
 }
 
-export function InitBot(
+export function InitBot<T = any>(
   config: BotConfig,
   makeRequest: typeof CoreMakerequest = CoreMakerequest
 ) {
-  return new BotRoot(config)
+  return new BotRoot<T>(config)
 }
 
 /**

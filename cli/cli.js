@@ -166,8 +166,6 @@ COMMANDS
 }
 
 async function cli(cmd, opts) {
-  console.log('x watup', cmd, map[cmd])
-
   const handler = map[cmd] ? map[cmd] : map['fallback']
 
   handler(cmd, opts)

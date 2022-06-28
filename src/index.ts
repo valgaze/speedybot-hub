@@ -10,13 +10,14 @@
 import { SpeedyConfig, SpeedybotHub } from './lib/speedybot_hub'
 import { handlers } from '../settings/handlers'
 import { config as rootConfig } from '../settings/config'
-
+import { RED, GREEN, YELLOW } from './lib/colors'
 import {
   SpeedyGuard,
   Hooks,
   websiteResponse,
   finale,
   ui_html,
+  colorGenerator,
 } from './lib/common'
 export { InitBot, WebhookBot } from './lib/bot'
 import { LocationAwareBot } from './lib/location'
@@ -29,7 +30,7 @@ export interface Env {
 }
 
 export default {
-  async fetch(request: Request, env: any, ctx: any): Promise<Response> {
+  async fetch(request: Request, env: Env, ctx: any): Promise<Response> {
     // Project  as rootConfig to specifiy auth token, validation handler (ie webhook secrets), location handler, fallbackText, etc
     const config: SpeedyConfig = {
       ...rootConfig,
@@ -38,6 +39,24 @@ export default {
 
     // Redirects, handle incoming webhooks, location, ui, etc
     const hooks: Hooks = {
+      '/green': {
+        method: 'GET',
+        async handler(request, env) {
+          return colorGenerator(GREEN)
+        },
+      },
+      '/red': {
+        method: 'GET',
+        async handler(request, env) {
+          return colorGenerator(RED)
+        },
+      },
+      '/yellow': {
+        method: 'GET',
+        async handler(request, env) {
+          return colorGenerator(YELLOW)
+        },
+      },
       '/jira_webhook': {
         method: 'POST',
         async validate(request) {
@@ -180,7 +199,7 @@ export default {
           // main speedybot
           ctx.waitUntil(
             new Promise<void>(async (resolve, reject) => {
-              const hub = new SpeedybotHub(config, handlers)
+              const hub = new SpeedybotHub<typeof env>(config, handlers, env)
               try {
                 await hub.processIncoming(json as ENVELOPES, request)
                 // resolve()
@@ -254,6 +273,7 @@ export default {
             meta: {
               url: request.url,
             },
+            env,
           }
           const Bot = new LocationAwareBot(BotConfig, payload)
           // Validate this is a request by checking messageId

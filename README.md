@@ -4,19 +4,19 @@
 ╔═╗ ╔═╗ ╔═╗ ╔═╗ ╔╦╗ ╦ ╦ ╔╗  ╔═╗ ╔╦╗
 ╚═╗ ╠═╝ ║╣  ║╣   ║║ ╚╦╝ ╠╩╗ ║ ║  ║
 ╚═╝ ╩   ╚═╝ ╚═╝ ═╩╝  ╩  ╚═╝ ╚═╝  ╩ HUB
-```
 
-```
 tl:dr; serverless chat that actually works
 ```
 
-Speedybot-hub is a zero-config and really fast central "hub" for all your conversation design needs-- especially rich 3rd-party integrations, incoming webhooks, handling files/photos, etc.
+See **[quickstart.md](https://github.com/valgaze/speedybot-hub/blob/deploy/quickstart.md)** on how to get up and running fast
+
+📚 [API Docs](https://github.com/valgaze/speedybot-hub/blob/deploy/api-docs/modules.md)
+
+Speedybot-hub is a zero-config and really fast central "hub" for all your conversation design needs
 
 ## Get up and running
 
-See **[quickstart.md](./quickstart.md)** on how to get up and running fast
-
-Alternatively, go ahead and **[🍴Fork this repo🍴](https://github.com/valgaze/speedybot-hub/blob/deploy/docs/fork_guide.md)** for a zero-effort that'll take care of almost everything for you.
+Alternatively, go ahead and **[🍴Fork this repo🍴](https://github.com/valgaze/speedybot-hub/blob/deploy/docs/fork_guide.md)** for a zero-effort starter that'll take care of almost everything for you and let you focus on the conversation.
 
 ## Features
 
@@ -32,13 +32,15 @@ Alternatively, go ahead and **[🍴Fork this repo🍴](https://github.com/valgaz
 
 ## Motivation
 
-Think of these little "hubs" as central spots around which all your conversation design infrastructure + integrations + all the rest can gather-- including incoming webhooks. You shouldn't have to think about anything but what matters in a conversation-- (1) the content + (2) useful/labor-savings rich integrations (files, location, sensors, etc)
+Think of a "hubs" as a central spots around which all your conversation design infrastructure + integrations + webhooks + all the rest can gather. You shouldn't have to think about anything but what matters in a conversation-- (1) the content + (2) useful/labor-savings rich integrations (files, location, sensors, etc)
 
-Speedybot-hub takes care of virtually all of the "everything else" details so all you and your team need to think about is about a single file: **[settings/handlers.ts](https://github.com/valgaze/speedybot-hub/blob/deploy/settings/handlers.ts)** (And if you need further customization like supporting multiple languages, **[prompting users for permissions](https://github.com/valgaze/speedybot-hub/blob/deploy/docs/assets/demo_location.gif), **[validating webhook secrets](https://developer.webex.com/blog/building-a-more-secure-bot)**, etc see **[settings/config.ts](https://github.com/valgaze/speedybot-hub/blob/deploy/settings/config.ts)\*\* )
+Speedybot-hub takes care of virtually all of the "everything else" so all you and your team need to think about is about a single file, handlers.ts: **[settings/handlers.ts](https://github.com/valgaze/speedybot-hub/blob/deploy/settings/handlers.ts)** (And if you need further customization like supporting multiple languages, **[prompting users for permissions](https://github.com/valgaze/speedybot-hub/blob/deploy/docs/assets/demo_location.gif), **[validating webhook secrets](https://developer.webex.com/blog/building-a-more-secure-bot)**, etc see **[settings/config.ts](https://github.com/valgaze/speedybot-hub/blob/deploy/settings/config.ts)\*\* )
 
 ### Special "magic" keywords
 
-The era of manually writing "handlers" or matching text with RegEx's is largely over. These days in order to build a credible conversation experience with conversation designers and other experts you will probably need to separate your authorship from code. We will be writing less "keyword" handlers and instead integrate with 3rd-party conversation services like **[Voiceflow](https://www.voiceflow.com/)**, **[Amazon Lex](https://aws.amazon.com/lex/)**, **[DialogFlow](https://cloud.google.com/dialogflow/docs)** You can of course still write regex's or manually match keywords, but you really don't need to anymore.
+The era of manually writing "handlers" or matching text with RegEx's is coming to an end. In the futrue there will be far fewer "keyword" handlers and instead deeper integration with 3rd-party conversation services like **[Voiceflow](https://www.voiceflow.com/)**, **[Amazon Lex](https://aws.amazon.com/lex/)**, **[DialogFlow](https://cloud.google.com/dialogflow/docs)**
+
+Some things can't/shoudn't live inisde an NLU, these magic keywords allow you to hook into platform-specific details:
 
 - <@catchall> (runs on every received message, useful when "passing" chat messages an NLU service and getting a response)
 - <@submit> (capture the result of an **[AdaptiveCard](https://developer.webex.com/docs/api/guides/cards)** form submission)

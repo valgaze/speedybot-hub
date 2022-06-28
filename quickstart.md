@@ -76,6 +76,12 @@ If you don't want to muck around with the terminal, you have 2 other options
 
 OR
 
-2. Just copy & paste it. From find your worker, and select Quick Edit button and from there you can copy/paste the contents of speedybot-hub/index.js directly into the editor, add your bot token and tap Save and deploy (make sure your webhooks are registered like step 4 above)
+2. Just copy 'n' paste it
+
+Find your worker from the **[dashboard](https://dash.cloudflare.com/)** and select Quick Edit button and from there you can copy/paste the contents of speedybot-hub/index.js directly into the editor
+
+Just add your bot token and tap Save and deploy
 
 ![image](./docs/assets/quickedit.jpg)
+
+Note: If you copy/paste you'll still need to register your webhooks on Step 4 above

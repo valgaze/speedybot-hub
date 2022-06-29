@@ -39,9 +39,14 @@ Root bot object used in handlers-- enshrined with many convenience helpers & les
 ### Methods
 
 - [api](BotRoot.md#api-1)
+- [buildImLink](BotRoot.md#buildimlink)
+- [buildLink](BotRoot.md#buildlink)
+- [buildMeetingLink](BotRoot.md#buildmeetinglink)
+- [buildSpaceLink](BotRoot.md#buildspacelink)
 - [card](BotRoot.md#card)
 - [clearScreen](BotRoot.md#clearscreen)
 - [dangerCard](BotRoot.md#dangercard)
+- [debugCard](BotRoot.md#debugcard)
 - [deleteMessage](BotRoot.md#deletemessage)
 - [dm](BotRoot.md#dm)
 - [fillTemplate](BotRoot.md#filltemplate)
@@ -49,11 +54,14 @@ Root bot object used in handlers-- enshrined with many convenience helpers & les
 - [generateHelp](BotRoot.md#generatehelp)
 - [getFile](BotRoot.md#getfile)
 - [getSelf](BotRoot.md#getself)
+- [groupRoomGuard](BotRoot.md#grouproomguard)
 - [guessContentType](BotRoot.md#guesscontenttype)
 - [handleExtension](BotRoot.md#handleextension)
+- [imageDetector](BotRoot.md#imagedetector)
 - [locationAuthorizer](BotRoot.md#locationauthorizer)
 - [log](BotRoot.md#log)
 - [lookUp](BotRoot.md#lookup)
+- [peekFile](BotRoot.md#peekfile)
 - [pickRandom](BotRoot.md#pickrandom)
 - [rando](BotRoot.md#rando)
 - [say](BotRoot.md#say)
@@ -68,9 +76,11 @@ Root bot object used in handlers-- enshrined with many convenience helpers & les
 - [sendURL](BotRoot.md#sendurl)
 - [skyCard](BotRoot.md#skycard)
 - [snippet](BotRoot.md#snippet)
+- [stashCard](BotRoot.md#stashcard)
 - [successCard](BotRoot.md#successcard)
 - [thread](BotRoot.md#thread)
 - [translate](BotRoot.md#translate)
+- [voteFlag](BotRoot.md#voteflag)
 - [warningCard](BotRoot.md#warningcard)
 
 ## Constructors
@@ -94,7 +104,7 @@ Root bot object used in handlers-- enshrined with many convenience helpers & les
 
 #### Defined in
 
-[lib/bot.ts:61](https://github.com/valgaze/speedybot-hub/blob/c3263c6/src/lib/bot.ts#L61)
+[lib/bot.ts:65](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/bot.ts#L65)
 
 ## Properties
 
@@ -119,7 +129,7 @@ Root bot object used in handlers-- enshrined with many convenience helpers & les
 
 #### Defined in
 
-[lib/bot.ts:59](https://github.com/valgaze/speedybot-hub/blob/c3263c6/src/lib/bot.ts#L59)
+[lib/bot.ts:63](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/bot.ts#L63)
 
 ___
 
@@ -135,7 +145,7 @@ ___
 
 #### Defined in
 
-[lib/bot.ts:45](https://github.com/valgaze/speedybot-hub/blob/c3263c6/src/lib/bot.ts#L45)
+[lib/bot.ts:49](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/bot.ts#L49)
 
 ___
 
@@ -145,7 +155,7 @@ ___
 
 #### Defined in
 
-[lib/bot.ts:48](https://github.com/valgaze/speedybot-hub/blob/c3263c6/src/lib/bot.ts#L48)
+[lib/bot.ts:52](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/bot.ts#L52)
 
 ___
 
@@ -155,7 +165,7 @@ ___
 
 #### Defined in
 
-[lib/bot.ts:46](https://github.com/valgaze/speedybot-hub/blob/c3263c6/src/lib/bot.ts#L46)
+[lib/bot.ts:50](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/bot.ts#L50)
 
 ___
 
@@ -167,7 +177,7 @@ ___
 
 #### Defined in
 
-[lib/bot.ts:58](https://github.com/valgaze/speedybot-hub/blob/c3263c6/src/lib/bot.ts#L58)
+[lib/bot.ts:62](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/bot.ts#L62)
 
 ___
 
@@ -183,7 +193,7 @@ ___
 
 #### Defined in
 
-[lib/bot.ts:51](https://github.com/valgaze/speedybot-hub/blob/c3263c6/src/lib/bot.ts#L51)
+[lib/bot.ts:55](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/bot.ts#L55)
 
 ___
 
@@ -193,7 +203,7 @@ ___
 
 #### Defined in
 
-[lib/bot.ts:47](https://github.com/valgaze/speedybot-hub/blob/c3263c6/src/lib/bot.ts#L47)
+[lib/bot.ts:51](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/bot.ts#L51)
 
 ___
 
@@ -203,7 +213,7 @@ ___
 
 #### Defined in
 
-[lib/bot.ts:50](https://github.com/valgaze/speedybot-hub/blob/c3263c6/src/lib/bot.ts#L50)
+[lib/bot.ts:54](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/bot.ts#L54)
 
 ## Methods
 
@@ -243,7 +253,105 @@ Reach an api that returns JSON-- alias to fetch
 
 #### Defined in
 
-[lib/bot.ts:206](https://github.com/valgaze/speedybot-hub/blob/c3263c6/src/lib/bot.ts#L206)
+[lib/bot.ts:210](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/bot.ts#L210)
+
+___
+
+### buildImLink
+
+▸ **buildImLink**(`target`, `label?`, `noBold?`): `string`
+
+Build a markdown, click'able link to a specific person (1-1 space)
+
+#### Parameters
+
+| Name | Type | Default value | Description |
+| :------ | :------ | :------ | :------ |
+| `target` | `string` | `undefined` | (email) |
+| `label?` | `string` | `undefined` |  |
+| `noBold` | `boolean` | `false` |  |
+
+#### Returns
+
+`string`
+
+#### Defined in
+
+[lib/bot.ts:1379](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/bot.ts#L1379)
+
+___
+
+### buildLink
+
+▸ **buildLink**(`target`, `label?`, `noBold?`): `string`
+
+Generate a markdown link to a resource
+
+#### Parameters
+
+| Name | Type | Default value |
+| :------ | :------ | :------ |
+| `target` | `string` | `undefined` |
+| `label?` | `string` | `undefined` |
+| `noBold` | `boolean` | `false` |
+
+#### Returns
+
+`string`
+
+markdown click'able link
+
+#### Defined in
+
+[lib/bot.ts:1346](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/bot.ts#L1346)
+
+___
+
+### buildMeetingLink
+
+▸ **buildMeetingLink**(`target`, `label?`, `noBold?`): `string`
+
+Build a markdown, click'able link to a meeting with a specific person)
+
+#### Parameters
+
+| Name | Type | Default value | Description |
+| :------ | :------ | :------ | :------ |
+| `target` | `string` | `undefined` | (email address) |
+| `label?` | `string` | `undefined` |  |
+| `noBold` | `boolean` | `false` |  |
+
+#### Returns
+
+`string`
+
+#### Defined in
+
+[lib/bot.ts:1363](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/bot.ts#L1363)
+
+___
+
+### buildSpaceLink
+
+▸ **buildSpaceLink**(`target`, `label?`, `noBold?`): `string`
+
+Build a markdown, click'able link to a specific space (OPT+CMD+K on Mac or CTRL-SHFT-K on windows to get space id)
+
+#### Parameters
+
+| Name | Type | Default value | Description |
+| :------ | :------ | :------ | :------ |
+| `target` | `string` | `undefined` | (email) |
+| `label?` | `string` | `undefined` |  |
+| `noBold` | `boolean` | `false` |  |
+
+#### Returns
+
+`string`
+
+#### Defined in
+
+[lib/bot.ts:1393](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/bot.ts#L1393)
 
 ___
 
@@ -285,7 +393,7 @@ Convenience helper that creates a SpeedyCard
 
 #### Defined in
 
-[lib/bot.ts:399](https://github.com/valgaze/speedybot-hub/blob/c3263c6/src/lib/bot.ts#L399)
+[lib/bot.ts:403](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/bot.ts#L403)
 
 ___
 
@@ -317,13 +425,13 @@ Clear the screen on desktop clients (useful for demos)
 
 #### Defined in
 
-[lib/bot.ts:960](https://github.com/valgaze/speedybot-hub/blob/c3263c6/src/lib/bot.ts#L960)
+[lib/bot.ts:1103](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/bot.ts#L1103)
 
 ___
 
 ### dangerCard
 
-▸ **dangerCard**(`payload`): [`SpeedyCard`](SpeedyCard.md)
+▸ **dangerCard**(`payload?`): [`SpeedyCard`](SpeedyCard.md)
 
 Returns an instance of a dangerCard. dangerCards have blue skylike background:
 
@@ -357,7 +465,47 @@ SpeedyCard
 
 #### Defined in
 
-[lib/bot.ts:1080](https://github.com/valgaze/speedybot-hub/blob/c3263c6/src/lib/bot.ts#L1080)
+[lib/bot.ts:1223](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/bot.ts#L1223)
+
+___
+
+### debugCard
+
+▸ **debugCard**(`payload?`): [`SpeedyCard`](SpeedyCard.md)
+
+Returns an instance of a debugCard
+
+![cards](../media/colored_cards.gif)
+
+```ts
+{
+ keyword: 'bingo',
+ async handler($bot) {
+   const debug = $bot.debugCard({
+    title: 'Testing 321',
+    subTitle: 'Testing 456',
+    chips: ['ping', 'pong'],
+   })
+ $bot.send(danger)
+ }
+}
+```
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `payload` | `Partial`<[`AbbreviatedSpeedyCard`](../modules.md#abbreviatedspeedycard)\> | (title, subtitle, etc) |
+
+#### Returns
+
+[`SpeedyCard`](SpeedyCard.md)
+
+SpeedyCard
+
+#### Defined in
+
+[lib/bot.ts:1250](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/bot.ts#L1250)
 
 ___
 
@@ -390,7 +538,7 @@ Delete a message (need a valid messageId)
 
 #### Defined in
 
-[lib/bot.ts:510](https://github.com/valgaze/speedybot-hub/blob/c3263c6/src/lib/bot.ts#L510)
+[lib/bot.ts:514](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/bot.ts#L514)
 
 ___
 
@@ -429,7 +577,7 @@ You can send a string or a card
 
 #### Defined in
 
-[lib/bot.ts:239](https://github.com/valgaze/speedybot-hub/blob/c3263c6/src/lib/bot.ts#L239)
+[lib/bot.ts:243](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/bot.ts#L243)
 
 ___
 
@@ -459,7 +607,7 @@ Fill in a template (usually used by sendTemplate)
 
 #### Defined in
 
-[lib/bot.ts:122](https://github.com/valgaze/speedybot-hub/blob/c3263c6/src/lib/bot.ts#L122)
+[lib/bot.ts:126](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/bot.ts#L126)
 
 ___
 
@@ -473,7 +621,7 @@ ___
 
 #### Defined in
 
-[lib/bot.ts:630](https://github.com/valgaze/speedybot-hub/blob/c3263c6/src/lib/bot.ts#L630)
+[lib/bot.ts:773](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/bot.ts#L773)
 
 ___
 
@@ -487,13 +635,16 @@ ___
 
 #### Defined in
 
-[lib/bot.ts:626](https://github.com/valgaze/speedybot-hub/blob/c3263c6/src/lib/bot.ts#L626)
+[lib/bot.ts:769](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/bot.ts#L769)
 
 ___
 
 ### getFile
 
-▸ **getFile**(`url`, `opts?`): `Promise`<{ `data`: {} \| `Response` \| `ArrayBuffer` ; `extension`: `string` ; `fileName`: `string` ; `markdownSnippet`: `string` ; `type`: `string`  }\>
+▸ **getFile**(`url`, `opts?`): `Promise`<{ `data`: `any` ; `extension`: `string` ; `fileName`: `string` ; `markdownSnippet`: `string` ; `type`: `string`  }\>
+
+Get a (secured) file's contents, probably would use this for examining uploaded files
+like JSON, excel (xlsx), etc
 
 #### Parameters
 
@@ -505,11 +656,28 @@ ___
 
 #### Returns
 
-`Promise`<{ `data`: {} \| `Response` \| `ArrayBuffer` ; `extension`: `string` ; `fileName`: `string` ; `markdownSnippet`: `string` ; `type`: `string`  }\>
+`Promise`<{ `data`: `any` ; `extension`: `string` ; `fileName`: `string` ; `markdownSnippet`: `string` ; `type`: `string`  }\>
+
+```ts
+{
+ keyword: '<@fileupload>',
+ async handler(bot, trigger) {
+       const [fileUrl] = trigger.message.files || []
+  const fileData = await $bot.getFile(fileUrl, {
+    responseType: 'arraybuffer',
+  })
+  const { fileName, extension, type } = fileData
+  $bot.say(
+    `The file you uploaded (${fileName}), is a ${extension} file of type ${type}`
+  )
+   // with fileData.data you have access to an arrayBuffer with the raw bytes of that file
+ }
+}
+```
 
 #### Defined in
 
-[lib/bot.ts:576](https://github.com/valgaze/speedybot-hub/blob/c3263c6/src/lib/bot.ts#L576)
+[lib/bot.ts:713](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/bot.ts#L713)
 
 ___
 
@@ -536,7 +704,34 @@ Get bot's meta data
 
 #### Defined in
 
-[lib/bot.ts:480](https://github.com/valgaze/speedybot-hub/blob/c3263c6/src/lib/bot.ts#L480)
+[lib/bot.ts:484](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/bot.ts#L484)
+
+___
+
+### groupRoomGuard
+
+▸ **groupRoomGuard**(`trigger`): { `card`: [`SpeedyCard`](SpeedyCard.md) ; `text`: `string` ; `violation`: `boolean`  } \| { `card`: ``null`` ; `text`: ``null`` ; `violation`: `boolean`  }
+
+Helper to restrict invocation of commands in group rooms
+
+TODO: make this config option on handlers directory
+restrict to certain users, etc
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `trigger` | `TRIGGERS` |
+
+#### Returns
+
+{ `card`: [`SpeedyCard`](SpeedyCard.md) ; `text`: `string` ; `violation`: `boolean`  } \| { `card`: ``null`` ; `text`: ``null`` ; `violation`: `boolean`  }
+
+a null text/card if the trigger doesn't belong to a group room or premade card + text
+
+#### Defined in
+
+[lib/bot.ts:1456](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/bot.ts#L1456)
 
 ___
 
@@ -556,7 +751,7 @@ ___
 
 #### Defined in
 
-[lib/bot.ts:741](https://github.com/valgaze/speedybot-hub/blob/c3263c6/src/lib/bot.ts#L741)
+[lib/bot.ts:884](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/bot.ts#L884)
 
 ___
 
@@ -576,13 +771,80 @@ ___
 
 #### Defined in
 
-[lib/bot.ts:641](https://github.com/valgaze/speedybot-hub/blob/c3263c6/src/lib/bot.ts#L641)
+[lib/bot.ts:784](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/bot.ts#L784)
+
+___
+
+### imageDetector
+
+▸ **imageDetector**(`token`): `VisionHelper`
+
+Returns an image detector (currently supports only google vision, but support for more providers)
+
+ ```ts
+{
+  keyword: '<@camera>',
+  async handler($bot, trigger: FILE_TRIGGER) {
+    const [fileUrl] = trigger.message.files || []
+    const fileData = await $bot.getFile(fileUrl, {
+      responseType: 'arraybuffer',
+    })
+    const { data } = fileData
+    try {
+      // Run image recognition
+      const detector = $bot.imageDetector($bot.env.VISION_TOKEN)
+
+      // 1) convert array buffer to base64
+      const base64 = detector.toBase64(data)
+
+      // 2) transmit data and retrieve labels
+      const res = await detector.detect(base64)
+
+      if ('error' in res && res.error.code === 401) {
+        const err = new Error()
+        err.message = 'VISION_TOKEN is invalid'
+        throw err
+      } else if ('responses' in res) {
+        // 3) Create a single list of all detections
+        const simplified = detector.simplify(res)
+
+        await $bot.send(`Here are some detections...`)
+        $bot.sendSnippet(simplified)
+      }
+    } catch (e: any) {
+      await $bot.send('There was a catastrophic issue with the vision tool')
+      $bot.send(
+        $bot
+          .dangerCard({
+            title: 'Vision is not enabled for this agent',
+            subTitle: e.message ? e.message : 'Vision service has issues',
+          })
+      )
+    }
+  },
+}
+```
+Returns image detector
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `token` | `string` |
+
+#### Returns
+
+`VisionHelper`
+
+#### Defined in
+
+[lib/bot.ts:672](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/bot.ts#L672)
 
 ___
 
 ### locationAuthorizer
 
-▸ **locationAuthorizer**(`trigger`, `message?`, `labels?`): `Promise`<`void`\>
+▸ **locationAuthorizer**(`trigger`, `message?`, `config?`): `Promise`<`void`\>
 
 Location Authorizer
 Ask the user for access to their location, if they provide permission run location authorizer
@@ -595,11 +857,21 @@ it is light/dark outside the user's location, timezone, country, etc
 
 NOTE: this may have compliance implications for your team/organization
 
+NOTE: The "handler" for location exists on the root configuration object under "location"
+
 ```ts
 {
  keyword: 'bingo',
  async handler(bot, trigger) {
-   $bot.locationAuthorizer(trigger)
+  // minimal amount needed
+  $bot.locationAuthorizer(trigger)
+
+   // with all options
+  $bot.locationAuthorizer(trigger, 'Here is some important information', {
+     url: 'http://www.privacy.com',
+     urlLabel: 'Privacy policy',
+     labels: { yes: 'yep', no: 'nope'}
+   })
  }
 }
 ```
@@ -608,13 +880,16 @@ NOTE: this may have compliance implications for your team/organization
 
 #### Parameters
 
-| Name | Type | Default value |
-| :------ | :------ | :------ |
-| `trigger` | `MESSAGE_TRIGGER` \| `FILE_TRIGGER` | `undefined` |
-| `message?` | `string` | `undefined` |
-| `labels` | `Object` | `undefined` |
-| `labels.no` | `string` | `'❌ Disallow'` |
-| `labels.yes` | `string` | `'✅ Allow'` |
+| Name | Type |
+| :------ | :------ |
+| `trigger` | `MESSAGE_TRIGGER` \| `FILE_TRIGGER` |
+| `message?` | `string` |
+| `config?` | `Object` |
+| `config.labels?` | `Object` |
+| `config.labels.no?` | `string` |
+| `config.labels.yes?` | `string` |
+| `config.url?` | `string` |
+| `config.urlLabel?` | `string` |
 
 #### Returns
 
@@ -622,7 +897,7 @@ NOTE: this may have compliance implications for your team/organization
 
 #### Defined in
 
-[lib/bot.ts:547](https://github.com/valgaze/speedybot-hub/blob/c3263c6/src/lib/bot.ts#L547)
+[lib/bot.ts:561](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/bot.ts#L561)
 
 ___
 
@@ -653,7 +928,7 @@ Logs to system
 
 #### Defined in
 
-[lib/bot.ts:930](https://github.com/valgaze/speedybot-hub/blob/c3263c6/src/lib/bot.ts#L930)
+[lib/bot.ts:1073](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/bot.ts#L1073)
 
 ___
 
@@ -690,7 +965,29 @@ path is invalid
 
 #### Defined in
 
-[lib/bot.ts:1043](https://github.com/valgaze/speedybot-hub/blob/c3263c6/src/lib/bot.ts#L1043)
+[lib/bot.ts:1186](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/bot.ts#L1186)
+
+___
+
+### peekFile
+
+▸ **peekFile**(`url`): `Promise`<{ `extension`: `string` ; `fileName`: `string` ; `type`: `string`  }\>
+
+Cheap way to get content-dispoition header & content-type and get extension
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `url` | `string` |
+
+#### Returns
+
+`Promise`<{ `extension`: `string` ; `fileName`: `string` ; `type`: `string`  }\>
+
+#### Defined in
+
+[lib/bot.ts:682](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/bot.ts#L682)
 
 ___
 
@@ -717,7 +1014,7 @@ $bot.pickRandom(list); // 2
 
 #### Defined in
 
-[lib/bot.ts:96](https://github.com/valgaze/speedybot-hub/blob/c3263c6/src/lib/bot.ts#L96)
+[lib/bot.ts:100](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/bot.ts#L100)
 
 ___
 
@@ -733,7 +1030,7 @@ Generate a random string of 11 characters (letters + numbers)
 
 #### Defined in
 
-[lib/bot.ts:637](https://github.com/valgaze/speedybot-hub/blob/c3263c6/src/lib/bot.ts#L637)
+[lib/bot.ts:780](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/bot.ts#L780)
 
 ___
 
@@ -761,7 +1058,7 @@ Legacy alias for $bot.send
 
 #### Defined in
 
-[lib/bot.ts:1172](https://github.com/valgaze/speedybot-hub/blob/c3263c6/src/lib/bot.ts#L1172)
+[lib/bot.ts:1497](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/bot.ts#L1497)
 
 ___
 
@@ -810,7 +1107,7 @@ roomId by default is whatever is bound to bot instance
 
 #### Defined in
 
-[lib/bot.ts:310](https://github.com/valgaze/speedybot-hub/blob/c3263c6/src/lib/bot.ts#L310)
+[lib/bot.ts:314](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/bot.ts#L314)
 
 ___
 
@@ -838,7 +1135,7 @@ Legacy alias for $bot.sendCard
 
 #### Defined in
 
-[lib/bot.ts:1187](https://github.com/valgaze/speedybot-hub/blob/c3263c6/src/lib/bot.ts#L1187)
+[lib/bot.ts:1512](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/bot.ts#L1512)
 
 ___
 
@@ -880,7 +1177,7 @@ At minimum, provide the file data & desired file extension
 
 #### Defined in
 
-[lib/bot.ts:678](https://github.com/valgaze/speedybot-hub/blob/c3263c6/src/lib/bot.ts#L678)
+[lib/bot.ts:821](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/bot.ts#L821)
 
 ___
 
@@ -916,7 +1213,7 @@ See more info here: https://developer.webex.com/docs/basics
 
 #### Defined in
 
-[lib/bot.ts:911](https://github.com/valgaze/speedybot-hub/blob/c3263c6/src/lib/bot.ts#L911)
+[lib/bot.ts:1054](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/bot.ts#L1054)
 
 ___
 
@@ -956,7 +1253,7 @@ JSON data or code-snippet to the user
 
 #### Defined in
 
-[lib/bot.ts:986](https://github.com/valgaze/speedybot-hub/blob/c3263c6/src/lib/bot.ts#L986)
+[lib/bot.ts:1129](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/bot.ts#L1129)
 
 ___
 
@@ -982,7 +1279,7 @@ $bot.sendRandom(list); // 'hello'
 
 #### Defined in
 
-[lib/bot.ts:107](https://github.com/valgaze/speedybot-hub/blob/c3263c6/src/lib/bot.ts#L107)
+[lib/bot.ts:111](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/bot.ts#L111)
 
 ___
 
@@ -1017,7 +1314,7 @@ Display a snippet to the user
 
 #### Defined in
 
-[lib/bot.ts:1003](https://github.com/valgaze/speedybot-hub/blob/c3263c6/src/lib/bot.ts#L1003)
+[lib/bot.ts:1146](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/bot.ts#L1146)
 
 ___
 
@@ -1056,7 +1353,7 @@ Send a url wrapped in a card
 
 #### Defined in
 
-[lib/bot.ts:157](https://github.com/valgaze/speedybot-hub/blob/c3263c6/src/lib/bot.ts#L157)
+[lib/bot.ts:161](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/bot.ts#L161)
 
 ___
 
@@ -1091,13 +1388,13 @@ Send a url wrapped in a card
 
 #### Defined in
 
-[lib/bot.ts:178](https://github.com/valgaze/speedybot-hub/blob/c3263c6/src/lib/bot.ts#L178)
+[lib/bot.ts:182](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/bot.ts#L182)
 
 ___
 
 ### skyCard
 
-▸ **skyCard**(`payload`): [`SpeedyCard`](SpeedyCard.md)
+▸ **skyCard**(`payload?`): [`SpeedyCard`](SpeedyCard.md)
 
 Returns an instance of a skyCard. SkyCards have blue skylike background:
 
@@ -1127,7 +1424,7 @@ SpeedyCard
 
 #### Defined in
 
-[lib/bot.ts:1161](https://github.com/valgaze/speedybot-hub/blob/c3263c6/src/lib/bot.ts#L1161)
+[lib/bot.ts:1333](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/bot.ts#L1333)
 
 ___
 
@@ -1150,13 +1447,36 @@ Takes input data and wraps in markdown backticks
 
 #### Defined in
 
-[lib/bot.ts:940](https://github.com/valgaze/speedybot-hub/blob/c3263c6/src/lib/bot.ts#L940)
+[lib/bot.ts:1083](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/bot.ts#L1083)
+
+___
+
+### stashCard
+
+▸ **stashCard**(`secret`, `message?`): [`SpeedyCard`](SpeedyCard.md)
+
+Temporary card that you can stash away data and destroy
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `secret` | `string` |
+| `message?` | `string` |
+
+#### Returns
+
+[`SpeedyCard`](SpeedyCard.md)
+
+#### Defined in
+
+[lib/bot.ts:614](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/bot.ts#L614)
 
 ___
 
 ### successCard
 
-▸ **successCard**(`payload`): [`SpeedyCard`](SpeedyCard.md)
+▸ **successCard**(`payload?`): [`SpeedyCard`](SpeedyCard.md)
 
 Returns an instance of a SuccessCard. SuccessCards have blue skylike background:
 
@@ -1190,7 +1510,7 @@ SpeedyCard
 
 #### Defined in
 
-[lib/bot.ts:1136](https://github.com/valgaze/speedybot-hub/blob/c3263c6/src/lib/bot.ts#L1136)
+[lib/bot.ts:1308](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/bot.ts#L1308)
 
 ___
 
@@ -1216,7 +1536,7 @@ Restrictions :(
 
 #### Defined in
 
-[lib/bot.ts:809](https://github.com/valgaze/speedybot-hub/blob/c3263c6/src/lib/bot.ts#L809)
+[lib/bot.ts:952](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/bot.ts#L952)
 
 ___
 
@@ -1282,13 +1602,37 @@ const hub = new SpeedybotHub(config, handlers, env)
 
 #### Defined in
 
-[lib/bot.ts:879](https://github.com/valgaze/speedybot-hub/blob/c3263c6/src/lib/bot.ts#L879)
+[lib/bot.ts:1022](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/bot.ts#L1022)
+
+___
+
+### voteFlag
+
+▸ **voteFlag**(`votes`, `payload?`): `Promise`<`void`\>
+
+Display a voting system-- each vote tap is guaranteed to at least contain
+a field "vote" with the user's selection
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `votes` | [a: string, b: string, c?: string, d?: string, e?: string] | (items to vote on, min 2, max 5) |
+| `payload` | `Object` | (any data you want to attach to each vote (roomId could be useful)) |
+
+#### Returns
+
+`Promise`<`void`\>
+
+#### Defined in
+
+[lib/bot.ts:1410](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/bot.ts#L1410)
 
 ___
 
 ### warningCard
 
-▸ **warningCard**(`payload`): [`SpeedyCard`](SpeedyCard.md)
+▸ **warningCard**(`payload?`): [`SpeedyCard`](SpeedyCard.md)
 
 Returns an instance of a SuccessCard. SuccessCards have blue skylike background:
 
@@ -1322,4 +1666,4 @@ SpeedyCard
 
 #### Defined in
 
-[lib/bot.ts:1107](https://github.com/valgaze/speedybot-hub/blob/c3263c6/src/lib/bot.ts#L1107)
+[lib/bot.ts:1279](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/bot.ts#L1279)

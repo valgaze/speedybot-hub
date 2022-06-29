@@ -19,7 +19,7 @@
 
 #### Defined in
 
-[lib/cards.ts:68](https://github.com/valgaze/speedybot-hub/blob/c3263c6/src/lib/cards.ts#L68)
+[lib/cards.ts:68](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/cards.ts#L68)
 
 ___
 
@@ -29,7 +29,7 @@ ___
 
 #### Defined in
 
-[lib/cards.ts:66](https://github.com/valgaze/speedybot-hub/blob/c3263c6/src/lib/cards.ts#L66)
+[lib/cards.ts:66](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/cards.ts#L66)
 
 ___
 
@@ -39,7 +39,7 @@ ___
 
 #### Defined in
 
-[lib/cards.ts:65](https://github.com/valgaze/speedybot-hub/blob/c3263c6/src/lib/cards.ts#L65)
+[lib/cards.ts:65](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/cards.ts#L65)
 
 ___
 
@@ -49,4 +49,4 @@ ___
 
 #### Defined in
 
-[lib/cards.ts:67](https://github.com/valgaze/speedybot-hub/blob/c3263c6/src/lib/cards.ts#L67)
+[lib/cards.ts:67](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/cards.ts#L67)

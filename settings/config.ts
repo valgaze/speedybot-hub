@@ -46,13 +46,6 @@ export const config: SpeedyConfig = {
           'See map 🗺'
         )
     )
-
-    await $bot.send(
-      $bot.card({
-        title: 'Restart?',
-        chips: [{ keyword: 'announce_dm', label: '🔄 Restart' }],
-      })
-    )
   },
   debug: true,
   fallbackText:

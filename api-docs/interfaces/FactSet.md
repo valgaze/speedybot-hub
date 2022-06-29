@@ -17,7 +17,7 @@
 
 #### Defined in
 
-[lib/cards.ts:83](https://github.com/valgaze/speedybot-hub/blob/c3263c6/src/lib/cards.ts#L83)
+[lib/cards.ts:83](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/cards.ts#L83)
 
 ___
 
@@ -27,4 +27,4 @@ ___
 
 #### Defined in
 
-[lib/cards.ts:82](https://github.com/valgaze/speedybot-hub/blob/c3263c6/src/lib/cards.ts#L82)
+[lib/cards.ts:82](https://github.com/valgaze/speedybot-hub/blob/6ed96ba/src/lib/cards.ts#L82)

@@ -1,13 +1,15 @@
 import { SpeedyCard } from './cards'
-import { BLUE, GREEN, RED, YELLOW } from './colors'
+import { BLUE, GREEN, REBECCAPURPLE, RED, YELLOW } from './colors'
 import { AbbreviatedSpeedyCard } from './cards'
 
 import {
-  makeRequest as CoreMakerequest,
-  checkers,
+  actions,
   API,
-  pickRandom,
+  checkers,
   fillTemplate,
+  makeRequest as CoreMakerequest,
+  peekFile,
+  pickRandom,
 } from './common'
 import {
   ToMessage,
@@ -17,7 +19,9 @@ import {
   MESSAGE_TRIGGER,
   MessageReply,
   FILE_TRIGGER,
+  TRIGGERS,
 } from './payloads.types'
+import { vision } from './vision'
 export type BotConfig<T = any> = {
   env?: T
   roomId: string
@@ -532,11 +536,21 @@ export class BotRoot<T = { BOT_TOKEN: string }> {
    *
    * NOTE: this may have compliance implications for your team/organization
    *
+   * NOTE: The "handler" for location exists on the root configuration object under "location"
+   *
    * ```ts
    * {
    *  keyword: 'bingo',
    *  async handler(bot, trigger) {
-   *    $bot.locationAuthorizer(trigger)
+   *   // minimal amount needed
+   *   $bot.locationAuthorizer(trigger)
+   *
+   *    // with all options
+   *   $bot.locationAuthorizer(trigger, 'Here is some important information', {
+   *      url: 'http://www.privacy.com',
+   *      urlLabel: 'Privacy policy',
+   *      labels: { yes: 'yep', no: 'nope'}
+   *    })
    *  }
    * }
    * ```
@@ -547,8 +561,19 @@ export class BotRoot<T = { BOT_TOKEN: string }> {
   public async locationAuthorizer(
     trigger: MESSAGE_TRIGGER | FILE_TRIGGER,
     message?: string,
-    labels = { yes: '✅ Allow', no: '❌ Disallow' }
+    config?: {
+      labels?: { yes?: string; no?: string }
+      url?: string
+      urlLabel?: string
+    }
   ) {
+    const labelsRef = config?.labels || {}
+
+    const labels = {
+      yes: labelsRef.yes || '✅ Allow',
+      no: labelsRef.no || '❌ Disallow',
+    }
+
     const { displayName } = await this.getSelf()
 
     // Sneak'ily using reply message as the "state", if doesn't exist don't allow
@@ -558,27 +583,145 @@ export class BotRoot<T = { BOT_TOKEN: string }> {
 
     const { id } = await this.send(rootMessage)
     const url = `${this.meta.url}location?roomId=${trigger.message.roomId}&messageId=${id}`
-    this.send(
-      this.warningCard({
-        title: message
-          ? message
-          : `'${displayName}' wants to use your location, allow?`,
+    const card = this.dangerCard({
+      title: `'${displayName}' wants to use your location, allow?`,
+    })
+      .setUrl(url, labels.yes)
+      .setData({
+        messageId: id,
+        action: 'location_abort',
       })
-        .setUrl(url, labels.yes)
-        .setData({
-          messageId: id,
-          action: 'location_abort',
-        })
-        .setButtonLabel(labels.no)
-    )
+      .setButtonLabel(labels.no)
+
+    if (config?.url) {
+      const link = this.buildLink(config.url, config.urlLabel || 'Link')
+      card.setText(link)
+    }
+
+    if (message) {
+      card.setDetail({ subTitle: `*${message}*` }, 'Details')
+    }
+    this.send(card)
   }
 
+  /**
+   * Temporary card that you can stash away data and destroy
+   * @param secret
+   *
+   * @param message
+   * @returns
+   */
+  public stashCard(secret: string, message?: string) {
+    return this.card({ title: message || 'Info' })
+      .setDetail({
+        subTitle: secret,
+      })
+      .setData({ action: actions.delete_stash_card })
+      .setButtonLabel('🔥 Burn Data')
+  }
+
+  /**
+   * Returns an image detector (currently supports only google vision, but support for more providers)
+   *
+   *  ```ts
+   * {
+   *   keyword: '<@camera>',
+   *   async handler($bot, trigger: FILE_TRIGGER) {
+   *     const [fileUrl] = trigger.message.files || []
+   *     const fileData = await $bot.getFile(fileUrl, {
+   *       responseType: 'arraybuffer',
+   *     })
+   *     const { data } = fileData
+   *     try {
+   *       // Run image recognition
+   *       const detector = $bot.imageDetector($bot.env.VISION_TOKEN)
+   *
+   *       // 1) convert array buffer to base64
+   *       const base64 = detector.toBase64(data)
+   *
+   *       // 2) transmit data and retrieve labels
+   *       const res = await detector.detect(base64)
+   *
+   *       if ('error' in res && res.error.code === 401) {
+   *         const err = new Error()
+   *         err.message = 'VISION_TOKEN is invalid'
+   *         throw err
+   *       } else if ('responses' in res) {
+   *         // 3) Create a single list of all detections
+   *         const simplified = detector.simplify(res)
+   *
+   *         await $bot.send(`Here are some detections...`)
+   *         $bot.sendSnippet(simplified)
+   *       }
+   *     } catch (e: any) {
+   *       await $bot.send('There was a catastrophic issue with the vision tool')
+   *       $bot.send(
+   *         $bot
+   *           .dangerCard({
+   *             title: 'Vision is not enabled for this agent',
+   *             subTitle: e.message ? e.message : 'Vision service has issues',
+   *           })
+   *       )
+   *     }
+   *   },
+   * }
+   * ```
+   * Returns image detector
+   *
+   **/
+  public imageDetector(token: string) {
+    const inst = vision(token)
+    return inst
+  }
+
+  /**
+   * Cheap way to get content-dispoition header & content-type and get extension
+   * @param url
+   * @returns
+   */
+  public async peekFile(
+    url: string
+  ): Promise<{ fileName: string; type: string; extension: string }> {
+    return peekFile(this.token, url)
+  }
+  /**
+   * Get a (secured) file's contents, probably would use this for examining uploaded files
+   * like JSON, excel (xlsx), etc
+   *
+   * @param url
+   *
+   * @param opts
+   * @returns
+   *
+   * ```ts
+   * {
+   *  keyword: '<@fileupload>',
+   *  async handler(bot, trigger) {
+   *        const [fileUrl] = trigger.message.files || []
+   *   const fileData = await $bot.getFile(fileUrl, {
+   *     responseType: 'arraybuffer',
+   *   })
+   *   const { fileName, extension, type } = fileData
+   *   $bot.say(
+   *     `The file you uploaded (${fileName}), is a ${extension} file of type ${type}`
+   *   )
+   *    // with fileData.data you have access to an arrayBuffer with the raw bytes of that file
+   *  }
+   * }
+   * ```
+   * */
   public async getFile(
     url: string,
     opts: {
       responseType?: 'arraybuffer' | 'json'
     } = {}
-  ) {
+  ): Promise<{
+    fileName: string
+    extension: string
+    type: string
+    data: ArrayBuffer | any
+    markdownSnippet: string
+  }> {
     const res = await this.makeRequest(
       url,
       {},
@@ -1077,8 +1220,37 @@ ${dataType === 'json' ? JSON.stringify(data, null, 2) : data}
    * @param payload (title, subtitle, etc)
    * @returns SpeedyCard
    */
-  public dangerCard(payload: Partial<AbbreviatedSpeedyCard>) {
+  public dangerCard(payload: Partial<AbbreviatedSpeedyCard> = {}) {
     return this.card(payload).setBackgroundImage(`data:image/png;base64,${RED}`)
+  }
+
+  /**
+   * Returns an instance of a debugCard
+   *
+   *
+   * ![cards](media://colored_cards.gif)
+   *
+   * ```ts
+   * {
+   *  keyword: 'bingo',
+   *  async handler($bot) {
+   *    const debug = $bot.debugCard({
+   *     title: 'Testing 321',
+   *     subTitle: 'Testing 456',
+   *     chips: ['ping', 'pong'],
+   *    })
+   *  $bot.send(danger)
+   *  }
+   * }
+   *```
+   *
+   * @param payload (title, subtitle, etc)
+   * @returns SpeedyCard
+   */
+  public debugCard(payload: Partial<AbbreviatedSpeedyCard> = {}) {
+    return this.card(payload).setBackgroundImage(
+      `data:image/png;base64,${REBECCAPURPLE}`
+    )
   }
 
   /**
@@ -1104,7 +1276,7 @@ ${dataType === 'json' ? JSON.stringify(data, null, 2) : data}
    * @param payload (title, subtitle, etc)
    * @returns SpeedyCard
    */
-  public warningCard(payload: Partial<AbbreviatedSpeedyCard>) {
+  public warningCard(payload: Partial<AbbreviatedSpeedyCard> = {}) {
     return this.card(payload).setBackgroundImage(
       `data:image/png;base64,${YELLOW}`
     )
@@ -1133,7 +1305,7 @@ ${dataType === 'json' ? JSON.stringify(data, null, 2) : data}
    * @param payload (title, subtitle, etc)
    * @returns SpeedyCard
    */
-  public successCard(payload: Partial<AbbreviatedSpeedyCard>) {
+  public successCard(payload: Partial<AbbreviatedSpeedyCard> = {}) {
     return this.card(payload).setBackgroundImage(
       `data:image/png;base64,${GREEN}`
     )
@@ -1158,11 +1330,164 @@ ${dataType === 'json' ? JSON.stringify(data, null, 2) : data}
    * @param payload (title, subtitle, etc)
    * @returns SpeedyCard
    */
-  public skyCard(payload: Partial<AbbreviatedSpeedyCard>) {
+  public skyCard(payload: Partial<AbbreviatedSpeedyCard> = {}) {
     return this.card(payload).setBackgroundImage(
       `data:image/gif;base64,${BLUE}`
     )
   }
+
+  /**
+   * Generate a markdown link to a resource
+   * @param target
+   * @param label
+   * @param noBold
+   * @returns markdown click'able link
+   */
+  public buildLink(target: string, label?: string, noBold = false): string {
+    // '[🍦 Talk to "Treatbot" & order iecream](webexteams://im?email=treatbot@webex.bot)'
+    let link = `[${label || target}](${target})`
+    if (!noBold) {
+      link = `**${link}**`
+    }
+    return link
+  }
+
+  /**
+   *
+   * Build a markdown, click'able link to a meeting with a specific person)
+   * @param target (email address)
+   * @param label
+   * @param noBold
+   * @returns
+   */
+  public buildMeetingLink(
+    target: string,
+    label?: string,
+    noBold = false
+  ): string {
+    return this.buildLink(`webexteams://meet?sip=${target}`, label, noBold)
+  }
+
+  /**
+   *
+   * Build a markdown, click'able link to a specific person (1-1 space)
+   * @param target (email)
+   * @param label
+   * @param noBold
+   * @returns
+   */
+  public buildImLink(target: string, label?: string, noBold = false): string {
+    // **[aa](http://www.google.com)**
+    // **[🤖 Talk to Speedybot & say "hi"](webexteams://im?email=speedybot@webex.bot)**
+    return this.buildLink(`webexteams://im?email=${target}`, label, noBold)
+  }
+
+  /**
+   *
+   * Build a markdown, click'able link to a specific space (OPT+CMD+K on Mac or CTRL-SHFT-K on windows to get space id)
+   * @param target (email)
+   * @param label
+   * @param noBold
+   * @returns
+   */
+  public buildSpaceLink(
+    target: string,
+    label?: string,
+    noBold = false
+  ): string {
+    // **[🗣 Get help](webexteams://im?space=6d124c80-f638-11ec-bc55-314549e772a9)**
+    return this.buildLink(`webexteams://im?space=${target}`, label, noBold)
+  }
+
+  /**
+   *
+   * Display a voting system-- each vote tap is guaranteed to at least contain
+   * a field "vote" with the user's selection
+   *
+   * @param votes (items to vote on, min 2, max 5)
+   * @param payload (any data you want to attach to each vote (roomId could be useful))
+   */
+  public async voteFlag(
+    votes: [a: string, b: string, c?: string, d?: string, e?: string],
+    payload = {}
+  ) {
+    // 🤔 Might be bad idea to make "success" become associated with voting item...
+    const $bot = this
+    const buildCard = (vote: string) =>
+      $bot
+        .successCard({ title: vote }) // different colors for each?
+        .setData({ vote: vote, ...payload })
+        .setButtonLabel('🗳 Vote')
+    votes.forEach((vote) => $bot.send(buildCard(vote as string)))
+  }
+
+  /**
+   *
+   * Send a url wrapped in a card
+   *
+   *
+   * ```ts
+   * {
+   *  keyword: 'bingo',
+   *  async handler($bot, trigger) {
+   *   const utterances = [
+   *     'Howdy $[name], here is a $[flavor]',
+   *     '$[name], one $[flavor] ice cream for you',
+   *   ]
+   *   const template = { name: 'Joe', flavor: 'strawberry' }
+   *   $bot.sendTemplate(utterances, template)
+   *
+   *  }
+   * }
+   *
+   * ```
+   */
+
+  /**
+   *
+   * Helper to restrict invocation of commands in group rooms
+   *
+   * TODO: make this config option on handlers directory
+   * restrict to certain users, etc
+   *
+   * @param trigger
+   * @returns a null text/card if the trigger doesn't belong to a group room or premade card + text
+   */
+  public groupRoomGuard(trigger: TRIGGERS):
+    | { text: string; card: SpeedyCard; violation: boolean }
+    | {
+        text: null
+        card: null
+        violation: boolean
+      } {
+    const blank = {
+      text: null,
+      card: null,
+      violation: false,
+    }
+    if ('message' in trigger && 'text' in trigger) {
+      if (trigger.message?.roomType === 'group') {
+        const text = `Sorry, you cannot run command '${trigger.text}' in group spaces, but you can run it here`
+        const card = this.card({
+          subTitle: text,
+          chips: [
+            { keyword: trigger.text, label: `Run command '${trigger.text}'` },
+          ],
+        })
+        const payload = {
+          card,
+          text,
+          violation: true,
+        }
+        return payload
+      } else {
+        return blank
+      }
+    } else {
+      return blank
+    }
+  }
+
   //Aliases
   /**
    * Legacy alias for $bot.send

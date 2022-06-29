@@ -75,7 +75,7 @@ const map = {
   },
   quickstart() {
     log(`
-For written quickstart instructions see here: https://github.com/valgaze/speedybot-hub/blob/master/quickstart.md
+For written quickstart instructions see here: https://github.com/valgaze/speedybot-hub/blob/deploy/quickstart.md
 
 To setup your webhooks:
 

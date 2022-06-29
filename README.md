@@ -44,6 +44,7 @@ Some things can't/shoudn't live inisde an NLU, these magic keywords allow you to
 
 - <@catchall> (runs on every received message, useful when "passing" chat messages an NLU service and getting a response)
 - <@submit> (capture the result of an **[AdaptiveCard](https://developer.webex.com/docs/api/guides/cards)** form submission)
+- <@camera> (runs whenever an image is uploaded (png, jpeg or anything specified on config.features.camera.validExtensions))
 - <@fileupload> (triggers when files uploaded-- `$bot.getFile` name and lots of other data
 - <@nomatch> (runs when no handler, aside from <@catchall>, matches the input)
 
@@ -146,3 +147,11 @@ export const handlers = [
   },
 ]
 ```
+
+## Image detector
+
+If you sign-up & setup credentials to Google vision (instructions here: **https://cloud.google.com/vision/docs/setup**) you can get easy image annotation with the built-in image-detector.
+
+A one-hour token is available with the cli under `gcloud auth print-access-token`-- once you have a token, add it as a secret with `npx wrangler secret put VISION_TOKEN`
+
+**[$bot.imageDetector docs](https://github.com/valgaze/speedybot-hub/blob/deploy/api-docs/classes/BotRoot.md#imagedetector)**

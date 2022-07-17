@@ -1,6 +1,6 @@
 // Root config-- locales, validation, location handler, etc
 export const config: SpeedyConfig = {
-  token: '__REPLACE__ME__', // Can use process, secrets/credentials manager, etc
+  token: process.env.token as string, // Can use process, secrets/credentials manager, etc
   locales: {
     es: {
       greetings: {

@@ -44,6 +44,8 @@ npm run setup
 
 - Once you have the bot's token, save it to **[settings/config.ts](./settings/config.ts)** under the `token` field
 
+Alternatively you can save it in the **[.env](./env)** under the `token` field
+
 ## 3. Set up your AWS credentials on your machine
 
 Note: You'll need an AWS account that has authorization/billing to create lambda functions
@@ -93,7 +95,7 @@ To make sure all is well, add your bot from Step 1 in a 1-1 chat session and tel
 
 ## 6. Deploy
 
-Once your agent is just the way you want it, you can deploy (rather than running on your local machine) using this command:
+Once your agent is just the way you want it, securely expose your **[access token as a secret](https://sst.dev/chapters/handling-secrets-in-sst.html)** and deploy using this command:
 
 ```
 npm run deploy

@@ -64,11 +64,15 @@ Note: You'll need an AWS account that has authorization/billing to create lambda
 
 ## 4. Boot your Bot & get its public url
 
+Start local websocket mode by running
+
 ```sh
-npm run deploy
+npm start
 ```
 
-If deployment is successful, you should your url that looks something like this: https://abcd123456.execute-api.us-east-1.amazonaws.com
+If deployment is successful, you should find that your url that looks something like this: https://abcd123456.execute-api.us-east-1.amazonaws.com
+
+Note: This uses SST's **[Live Lambda Development feature](https://docs.sst.dev/live-lambda-development)**
 
 ## 4. Register webhooks using Speedybot Garage
 
@@ -76,7 +80,7 @@ In order to receive messages, you'll need to register your agent's URL to receiv
 
 Try using **[Speedybot bot-garage](https://codepen.io/valgaze/full/MWVjEZV)**, (source available for inspection **[here](https://github.com/valgaze/speedybot-hub/blob/deploy/settings/speedybot_garage.html)**) and select "webhooks" after registering your token
 
-![image](./docs/assets/garage_demo.gif)
+![image](./docs/assets/speedybot_garage_demo.gif)
 
 ## 4b. (Alternative) Register webhooks using the command line
 
@@ -97,9 +101,17 @@ To make sure all is well, add your bot from Step 1 in a 1-1 chat session and tel
 
 ![image](https://raw.githubusercontent.com/valgaze/speedybot/master/docs/assets/healthcheck.gif)
 
+## 6. Deploy
+
+Once your agent is just the way you want it, you can deploy (rather than running on your local machine) using this command:
+
+```
+npm run deploy
+```
+
 ## Issues
 
-### Current issues/bugs 🐞🪲
+### Potential issues/bugs 🐞🪲
 
 1. "cold-start" problem
 
@@ -107,7 +119,7 @@ To make sure all is well, add your bot from Step 1 in a 1-1 chat session and tel
 
 - Various solutions available like provisioned concurrency, various tune-ups & tricks
 
-2. Occassional "doubling" problem
+2. ~"doubling" problem~
 
 - Not consistent: Occassionally a command needs to be sent twice in order to provoke a response from the agent-- unclear why
 

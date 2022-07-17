@@ -56,7 +56,15 @@ npm run deploy
 
 If deployment is successful, you should your url that looks something like this: https://abcd123456.execute-api.us-east-1.amazonaws.com
 
-## 4. Register webhooks
+## 4. Register webhooks using Speedybot Garage
+
+In order to receive messages, you'll need to register your agent's URL to receive webhooks for chat.
+
+Try using **[Speedybot bot-garage](https://codepen.io/valgaze/full/MWVjEZV)**, (source available for inspection **[here](https://github.com/valgaze/speedybot-hub/blob/deploy/settings/speedybot_garage.html)**) and select "webhooks" after registering your token
+
+![image](./docs/assets/garage_demo.gif)
+
+## 4b. (Alternative) Register webhooks using the command line
 
 In a terminal enter the following command:
 

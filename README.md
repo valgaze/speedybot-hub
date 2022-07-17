@@ -8,6 +8,8 @@
 tl:dr; serverless chat that actually works
 ```
 
+**NOTE:** If you're looking for an AWS Lambda implementation rather than Workers/V8 Isolates, see the **[λ lambda branch](https://github.com/valgaze/speedybot-hub/tree/lambda#readme)**
+
 See **[quickstart.md](https://github.com/valgaze/speedybot-hub/blob/deploy/quickstart.md)** on how to get up and running fast
 
 📚 [API Docs](https://github.com/valgaze/speedybot-hub/blob/deploy/api-docs/modules.md)

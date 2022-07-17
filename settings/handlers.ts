@@ -1,7 +1,7 @@
 export const handlers: BotHandler<BotEnvs>[] = [
   {
     keyword: ['hi', 'hello', 'hey', 'yo', 'watsup', 'hola'],
-    async handler($bot, trigger: any) {
+    async handler($bot, trigger) {
       const utterances = [
         `Heya how's it going $[name]?`,
         `Hi there, $[name]!`,
@@ -27,7 +27,6 @@ export const handlers: BotHandler<BotEnvs>[] = [
             { keyword: 'kitchensink', label: '💯 Everything (warning: fast)' },
             { keyword: 'help', label: '🚒 help' },
             { keyword: 'files', label: '🗂 files' },
-            { keyword: 'location', label: '🗺 location' },
           ],
           image: 'https://i.imgur.com/LybLW7J.gif',
         })
@@ -43,10 +42,13 @@ export const handlers: BotHandler<BotEnvs>[] = [
               '📚 Read **[The API Docs](https://github.com/valgaze/speedybot-hub/blob/deploy/api-docs/classes/BotRoot.md#methods)**'
             )
             .setText(
-              '⌨️ See **[The source code for this agent](https://github.com/valgaze/speedybot-hub/blob/deploy/settings/handlers.ts)**'
+              '⌨️ See **[The source code for this agent](https://github.com/valgaze/speedybot-hub/blob/lambda/settings/handlers.ts)**'
             )
             .setText(
               '**[🍦 Talk to "Treatbot" & order ice cream](webexteams://im?email=treatbot@webex.bot)**'
+            )
+            .setText(
+              '**[🍦 Talk to the OTHER serverless bot using Workers/V8 Isolates architecture](webexteams://im?email=speedybot@webex.bot)**'
             )
             .setText(
               '**[🗣 Get help](webexteams://im?space=6d124c80-f638-11ec-bc55-314549e772a9)**'
@@ -86,6 +88,7 @@ export const handlers: BotHandler<BotEnvs>[] = [
   {
     keyword: '<@catchall>',
     async handler($bot, trigger) {
+      $bot.log('<@catchall lol trigger>', trigger)
       const { text } = trigger
       // Usually use this to connec to NLU, see https://github.com/valgaze/treatbot for an examplw
       $bot.log(
@@ -129,15 +132,12 @@ export const handlers: BotHandler<BotEnvs>[] = [
     keyword: '<@submit>',
     hideHelp: true,
     handler($bot, trigger: any) {
+      console.log('##>>', trigger.attachmentAction)
       $bot.send(
         `Submission received! You sent us ${JSON.stringify(
-          trigger.attachmentAction.inputs
+          trigger.attachmentAction?.inputs
         )}`
       )
-      if (trigger.attachmentActions.inputs?.action === 'delete_card') {
-        $bot.send(trigger.attachmentAction.messageId)
-        $bot.deleteMessage(trigger.attachmentAction.messageId)
-      }
     },
     helpText:
       'This is a special hander that fires whenever a button is pressed on an Adaptive Card',
@@ -323,13 +323,6 @@ export const handlers: BotHandler<BotEnvs>[] = [
     helpText: 'Show the user help information',
   },
   {
-    keyword: 'location',
-    async handler($bot, trigger) {
-      $bot.locationAuthorizer(trigger)
-    },
-    helpText: 'Prompt the user to ask for permission questions',
-  },
-  {
     keyword: '$clear',
     hideHelp: true,
     async handler($bot, trigger) {
@@ -362,10 +355,6 @@ export const handlers: BotHandler<BotEnvs>[] = [
   {
     keyword: 'kitchensink',
     async handler($bot, trigger) {
-      const roomGuard = $bot.groupRoomGuard(trigger)
-      if (roomGuard.violation === true) {
-        return $bot.dm(trigger.personId, roomGuard.card as SpeedyCard)
-      }
       // Clearscreen (only works desktop)
       await $bot.clearScreen()
       await $bot.send(`## Kitchen Sink`)
@@ -525,8 +514,7 @@ ${JSON.stringify(trigger, null, 2)}
 ]
 
 // Imports
-import { SpeedyCard } from '../src/docs'
-import { BotHandler, FILE_TRIGGER } from '../src/lib/payloads.types'
+import { BotHandler, FILE_TRIGGER } from './../lib/payloads.types'
 
 // For nice typing, add secrets availble on $bot.env
 export type BotEnvs = {

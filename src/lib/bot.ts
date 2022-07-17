@@ -567,41 +567,44 @@ export class BotRoot<T = { BOT_TOKEN: string }> {
       urlLabel?: string
     }
   ) {
-    const labelsRef = config?.labels || {}
+    return this.send(
+      `Sorry, $bot.locationAuthorizer is not implemented in this environment`
+    )
+    // const labelsRef = config?.labels || {}
 
-    const labels = {
-      yes: labelsRef.yes || '✅ Allow',
-      no: labelsRef.no || '❌ Disallow',
-    }
+    // const labels = {
+    //   yes: labelsRef.yes || '✅ Allow',
+    //   no: labelsRef.no || '❌ Disallow',
+    // }
 
-    const { displayName } = await this.getSelf()
+    // const { displayName } = await this.getSelf()
 
-    // Sneak'ily using reply message as the "state", if doesn't exist don't allow
-    const rootMessage: ToMessage = {
-      text: `'${displayName}' is requesting access to limited location data (country, timezone, city) in order to perform that action`,
-    }
+    // // Sneak'ily using reply message as the "state", if doesn't exist don't allow
+    // const rootMessage: ToMessage = {
+    //   text: `'${displayName}' is requesting access to limited location data (country, timezone, city) in order to perform that action`,
+    // }
 
-    const { id } = await this.send(rootMessage)
-    const url = `${this.meta.url}location?roomId=${trigger.message.roomId}&messageId=${id}`
-    const card = this.dangerCard({
-      title: `'${displayName}' wants to use your location, allow?`,
-    })
-      .setUrl(url, labels.yes)
-      .setData({
-        messageId: id,
-        action: 'location_abort',
-      })
-      .setButtonLabel(labels.no)
+    // const { id } = await this.send(rootMessage)
+    // const url = `${this.meta.url}location?roomId=${trigger.message.roomId}&messageId=${id}`
+    // const card = this.dangerCard({
+    //   title: `'${displayName}' wants to use your location, allow?`,
+    // })
+    //   .setUrl(url, labels.yes)
+    //   .setData({
+    //     messageId: id,
+    //     action: 'location_abort',
+    //   })
+    //   .setButtonLabel(labels.no)
 
-    if (config?.url) {
-      const link = this.buildLink(config.url, config.urlLabel || 'Link')
-      card.setText(link)
-    }
+    // if (config?.url) {
+    //   const link = this.buildLink(config.url, config.urlLabel || 'Link')
+    //   card.setText(link)
+    // }
 
-    if (message) {
-      card.setDetail({ subTitle: `*${message}*` }, 'Details')
-    }
-    this.send(card)
+    // if (message) {
+    //   card.setDetail({ subTitle: `*${message}*` }, 'Details')
+    // }
+    // this.send(card)
   }
 
   /**
@@ -616,7 +619,7 @@ export class BotRoot<T = { BOT_TOKEN: string }> {
       .setDetail({
         subTitle: secret,
       })
-      .setData({ action: actions.delete_stash_card })
+      .setData({ action: actions.delete })
       .setButtonLabel('🔥 Burn Data')
   }
 

@@ -68,7 +68,7 @@ Note: This uses SST's **[Live Lambda Development feature](https://docs.sst.dev/l
 
 In order to receive messages, you'll need to register your agent's URL to receive webhooks for chat.
 
-Try using **[Speedybot bot-garage](https://codepen.io/valgaze/full/MWVjEZV)**, (source available for inspection **[here](https://github.com/valgaze/speedybot-hub/blob/deploy/settings/speedybot_garage.html)**) and select "webhooks" after registering your token
+Try using **[Speedybot bot-garage](https://codepen.io/valgaze/full/MWVjEZV)**, (source available for inspection **[here](https://github.com/valgaze/speedybot-hub/blob/lambda/settings/speedybot_garage.html)**) and select "webhooks" after registering your token
 
 ![image](./docs/assets/speedybot_garage_demo.gif)
 

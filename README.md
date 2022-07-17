@@ -1,3 +1,17 @@
+TODO 0) come up with propagand blitz, video paln
+Show visual editor
+Show lambda serverless bots with typescript
+
+Oh yah btw here is SERVERLESS
+
+Here are some API docs
+Here is speedybot-lambda
+speedybot (speedybot@webex.bot) runs on a Worker/V8 Isolate
+
+All you need to worry about it settings/handlers.ts
+
+1. sayhello, publish speedybot-web
+
 # 🏖 `speedybot hub` [λLambda-editionλ] super-fast "no-ops" conversation design infrastructure
 
 ```

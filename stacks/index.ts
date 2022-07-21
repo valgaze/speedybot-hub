@@ -5,7 +5,10 @@ export default function main(app: sst.App): void {
   // Set default runtime for all functions
   app.setDefaultFunctionProps({
     runtime: 'nodejs14.x',
-    environment: { token: process.env.token as string },
+    environment: {
+      token: process.env.token as string,
+      secret: process.env.secret as string,
+    },
   })
 
   new MyStack(app, 'my-stack')

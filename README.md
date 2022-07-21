@@ -44,9 +44,9 @@ npm run setup
 
 - If you don't have a bot, create one and save the token from here: **[https://developer.webex.com/my-apps/new/bot](https://developer.webex.com/my-apps/new/bot)**
 
-- Once you have the bot's token, save it to **[settings/config.ts](./settings/config.ts)** under the `token` field
+- Copy the file **[.env.example](./.env.example)** as `.env` in the root of your project and save your access token under the `token` field
 
-Alternatively you can save it in the **[.env](./env)** under the `token` field
+Note: The `.env` file will never be aded to source control, **[further details here](https://docs.sst.dev/environment-variables)**
 
 ## 3. Set up your AWS credentials on your machine
 
@@ -72,7 +72,7 @@ Note: This uses SST's **[Live Lambda Development feature](https://docs.sst.dev/l
 
 In order to receive messages, you'll need to register your agent's URL to receive webhooks for chat.
 
-Try using **[Speedybot bot-garag 🔧🤖](https://codepen.io/valgaze/full/MWVjEZV)**, (source available for inspection **[here](https://github.com/valgaze/speedybot-hub/blob/lambda/settings/speedybot_garage.html)**) and select "webhooks" after registering your token
+Try using **[Speedybot bot-garage 🔧🤖](https://codepen.io/valgaze/full/MWVjEZV)**, (source available for inspection **[here](https://github.com/valgaze/speedybot-hub/blob/lambda/settings/speedybot_garage.html)**) and select "webhooks" after registering your token
 
 ![image](./docs/assets/speedybot_garage_demo.gif)
 
@@ -97,7 +97,13 @@ To make sure all is well, add your bot from Step 1 in a 1-1 chat session and tel
 
 ## 6. Deploy
 
-Once your agent is just the way you want it, securely expose your **[access token as a secret](https://sst.dev/chapters/handling-secrets-in-sst.html)** and deploy using this command:
+Once your agent is just the way you want it, make sure
+
+1. You have set a webhook "secret", instructions **[here](#webhook-secrets)**
+2. You have securely exposed your **[access token as a secret](https://sst.dev/chapters/handling-secrets-in-sst.html)** in **[.env](./env.example)**
+3. You have a strategy for staging deployments, **[details here](https://docs.sst.dev/architecture#stages)**
+
+When all is ready, just hit CTRL-C to stop your local websocket service and deploy the real thing:
 
 ```
 npm run deploy
@@ -116,3 +122,55 @@ npm run deploy
 2. ~"doubling" problem~
 
 - Not consistent: Occassionally a command needs to be sent twice in order to provoke a response from the agent-- unclear why (would never occur when running locally w/ `npm start`)
+
+## Webhook Secrets
+
+<details><summary>Webhook Secrets</summary>
+
+You can secure your webhooks using "secrets", below are how to use them
+
+1. Come up with a secret and save it under `secret` in your project's root **[.env file](./.env.example)**
+
+2. Create a new webhook in **[Speedybot bot-garage 🔧🤖](https://codepen.io/valgaze/full/MWVjEZV)** & include the secret
+
+3. In **[settings/config.ts](./settings/config.ts)** add a validation function that looks something like this:
+
+```
+import crypto from 'crypto'
+import { APIGatewayProxyEventV2, Context } from 'aws-lambda'
+
+async function validate(body: any, event: APIGatewayProxyEventV2, ctx: Context) {
+  const validateSignature = <T = any>(
+    signature: string,
+    secret: string,
+    requestBody: T
+  ): boolean => {
+    const hmac = crypto.createHmac('sha1', secret)
+    if (typeof requestBody === 'string') {
+      hmac.update(requestBody)
+    } else {
+      hmac.update(JSON.stringify(requestBody))
+    }
+    const isValid = hmac.digest('hex') === signature
+    return isValid
+  }
+  const signature = event.headers['x-spark-signature']
+  const secret = process.env.secret // passed through via .env
+  if (secret) {
+    const proceed = validateSignature(
+      signature as string,
+      secret as string,
+      body
+    )
+    return { proceed: proceed }
+  }
+}
+```
+
+4. Delete any non-secured webhooks if they exist and deploy your secured project with
+
+```
+npm run deploy
+```
+
+</details>

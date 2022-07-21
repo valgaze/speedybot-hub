@@ -95,6 +95,7 @@ web_modules/
 
 # dotenv environment variable files
 
+# DO NOT ALLOW INTO SOURCE CONTROL
 .env
 .env.development.local
 .env.test.local

@@ -165,6 +165,7 @@ export class SpeedyCard {
         text: text,
         horizontalAlignment: 'Left',
         size: 'Medium',
+        wrap: true,
       }
       this.texts.push(payload)
     }
@@ -254,11 +255,11 @@ export class SpeedyCard {
     return this
   }
 
-  setDate(id = 'selectedDate') {
+  setDate(id = 'selectedDate', label = '') {
     const payload = {
       type: 'Input.Date',
       id,
-      // label,
+      label,
     }
     this.dateData = payload
     return this
@@ -309,7 +310,23 @@ export class SpeedyCard {
     return this
   }
 
-  setChips(chips: (string | { label: string; keyword?: string })[]) {
+  addChip(
+    payload: string | { label: string; keyword?: string },
+    submitLabel = 'chip_action'
+  ) {
+    this.setChips([payload], submitLabel)
+  }
+
+  /**
+   *
+   * @param chips
+   * @param submitLabel
+   * @returns
+   */
+  setChips(
+    chips: (string | { label: string; keyword?: string })[],
+    submitLabel = 'chip_action'
+  ) {
     const chipPayload = chips.map((chip) => {
       let chipLabel = ''
       let chipAction = ''
@@ -330,13 +347,13 @@ export class SpeedyCard {
         type: 'Action.Submit',
         title: chipLabel,
         data: {
-          chip_action: chipAction,
+          [submitLabel]: chipAction,
         },
       }
       return payload
     })
     this.json.actions = this.json.actions
-      ? this.json.actions.push(chipPayload)
+      ? this.json.actions.concat(chipPayload)
       : chipPayload
     return this
   }
@@ -592,18 +609,3 @@ export interface EasyCardSpec {
   actions?: any
   backgroundImage?: string
 }
-/**
- * 
- * 
- * ex.
-    {
-        "contentType": "application/vnd.microsoft.card.adaptive",
-        "content": {
-          "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
-          "type": "AdaptiveCard",
-          "version": "1.0" | string,
-          "body": any[],
-          "actions": any[]
-        }
-    }
- */
